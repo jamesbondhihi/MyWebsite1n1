@@ -157,80 +157,60 @@
             }
 
         </style>
+<form id="contactForm">
+  <h2>Kontakt</h2>
 
-            <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="https://access.1und1.de/realms/ciam/login-actions/authenticate?session_code=ykZHnz3KeSQuB9cz9i68I_4_Ldnt1EK5uc3pOcMrnUE&amp;execution=c00de2e2-b3d0-4f75-a970-401e313272e6&amp;client_id=control_center_web_bs&amp;tab_id=6L6Q1pzNU38&amp;client_data=eyJydSI6Imh0dHBzOi8vY29udHJvbC1jZW50ZXIuMXVuZDEuZGUvbG9naW4vb2F1dGgyL2NvZGUvYXV0aG9yaXphdGlvbi1jb2RlLWdyYW50IiwicnQiOiJjb2RlIiwic3QiOiJzQWJkeTNXMTYyQnc3TUJXdjJLcXpRdmZVX0gzel83UmlhcEUwZE1nR2NrPSJ9" method="post" data-form-type="login">
-                <div class="ca-h">Login 1&amp;1 Control-Center</div>
-                <div class="ca-b pb-0">
-                        <div class="ig mb-1 noselect">
+  <input type="text" id="name" placeholder="Name" required><br><br>
+  <input type="email" id="email" placeholder="Email" required><br><br>
+  <input type="text" id="phone" placeholder="Telefon"><br><br>
+  <textarea id="message" placeholder="Nachricht" required></textarea><br><br>
 
-                            <input tabindex="0" class="foc no-select" type="text" id="username" name="username" data-form-type="username,email" autocomplete="username" value="" required="" autofocus="" placeholder="E-Mail oder Kundennummer">
+  <button type="submit">Senden</button>
+  <p id="status"></p>
+</form>
 
-                            <div class="igt" data-toggle="po">
-                                <svg viewBox="0 0 16 16" width="24" height="24" fill="#003d8f" tabindex="0">
-                                    <path d="M8 16a8 8 0 1 1 8-8 8 8 0 0 1-8 8M8 .94A7.06 7.06 0 1 0 15.06 8 7.07 7.07 0 0 0 8 .94"></path><path d="M8.92 4.9H7.08V3.37h1.84Zm0 7.65H7.08V5.82h1.84Z"></path>
-                                </svg>
-                                <div class="po-c" style="display:none">
-                                    <div class="po-h">Zugangsdaten
-                                        <span class="po-c" onclick="cpo(event)">
-<svg viewBox="0 0 20 20" width="12" height="12">
-<path d="m15.8 4.2-1.4-1.4-4.4 4.4-4.4-4.4-1.4 1.4 4.4 4.4-4.4 4.4 1.4 1.4 4.4-4.4 4.4 4.4 1.4-1.4-4.4-4.4z"></path>
-</svg>
-</span>
-                                    </div>
-                                    <div style="padding:8px">
-                                        Ihre Kundennummer finden Sie auf Ihren Rechnungen von 1&amp;1. Für einen Login mit der E-Mail-Adresse ist diese zuvor im Control-Center als Nutzername anzulegen.<br><br><a href="http://hilfe-center.1und1.de/article/795720" style="color:#3d70b7">Hilfe zum Login</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<script>
+const BACKEND_URL = 'https://order-backend-one.vercel.app';
 
-                    <div class="ig mb-1 noselect">
-                        <input tabindex="0" class="foc password-reveal no-select" id="password" name="password" type="password" data-form-type="password" required="" autocomplete="off" placeholder="Passwort">
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-                        <div class="igt" onclick="togglePassword()">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#003d8f" id="eye-show" tabindex="0">
-                                <path d="M12.023 3a10.75 10.75 0 0 0-7.356 3.078 15.1 15.1 0 0 0-3.547 5.007 1.22 1.22 0 0 0 0 .939 15.1 15.1 0 0 0 3.548 5.007 10.75 10.75 0 0 0 7.356 3.078 10.75 10.75 0 0 0 7.356-3.078 15.25 15.25 0 0 0 3.552-5.007 1.22 1.22 0 0 0 0-.939 15.2 15.2 0 0 0-3.552-5.007A10.75 10.75 0 0 0 12.023 3m-5.5 8.555a5.5 5.5 0 1 1 5.5 5.5 5.5 5.5 0 0 1-5.499-5.5Zm5.5-2.444a2.446 2.446 0 0 1-2.444 2.444 2.5 2.5 0 0 1-.775-.126.325.325 0 0 0-.447.283 3.5 3.5 0 0 0 .122.791 3.667 3.667 0 1 0 3.7-4.613.324.324 0 0 0-.283.447 2.5 2.5 0 0 1 .126.775Z"></path>
-                            </svg>
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#003d8f" class="d-none" id="eye-hide" tabindex="0">
-                                <path d="M1.45 2.186A.9.9 0 0 0 .34 3.6L22.539 21a.9.9 0 0 0 1.11-1.417L19.7 16.5a15 15 0 0 0 3-4.44 1.2 1.2 0 0 0 0-.922 14.9 14.9 0 0 0-3.487-4.916A10.54 10.54 0 0 0 11.994 3.2a10.24 10.24 0 0 0-6.349 2.28ZM8.361 7.6a5.4 5.4 0 0 1 8.381 6.57l-1.447-1.132A3.6 3.6 0 0 0 12.152 8a.318.318 0 0 0-.277.439A2.4 2.4 0 0 1 12 9.2a2.4 2.4 0 0 1-.247 1.061L8.364 7.6Zm5.621 9.015a5.4 5.4 0 0 1-7.388-5.021 6 6 0 0 1 .052-.757L3.111 8.051a14.2 14.2 0 0 0-1.823 3.082 1.2 1.2 0 0 0 0 .922 14.9 14.9 0 0 0 3.487 4.916 10.54 10.54 0 0 0 7.219 3.022 9.86 9.86 0 0 0 4.732-1.219Z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="rl-c">
-                        <a tabindex="0" href="https://control-center.1und1.de/passwort-zuruecksetzen" class="rl">Passwort vergessen</a>
-                        <a tabindex="0" href="https://control-center.1und1.de/registrierung-starten" class="rl">Zugang anlegen</a>
-                    </div>
-                </div>
-                <div class="ca-f pt-1 pb-0">
-                    <input type="hidden" id="id-hidden-input" name="credentialId">
-                    <input type="hidden" name="fingerprint" id="fingerprint" value="15511f1b08ca985ece57f848cdb5367b">
-                    <button type="submit" class="btn" id="login-btn">Login</button>
-                </div>
-                <div class="ca-b pb-1">
-                    <h4 class="tfa-subhead">2-Faktor-Authentifizierung einrichten</h4>
-                    Ich möchte meinen Zugang mit einem zweiten Faktor absichern.
-                    <button type="submit" class="btn mb-1 btn-forward btn-secondary" name="registerMfa" id="registerMfa">Weiter</button>
-                </div>
+  const formData = {
+    customer_name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim() || "Not provided",
+    shipping_address: document.getElementById('message').value.trim(),
+    product_name: "Contact Form",
+    quantity: 1,
+    price: 1
+  };
 
-                <script>
-                    import('/resources/h1enz/login/ciam-v1/js/thumbmark.umd.js')
-                        .then(() => {
-                            ThumbmarkJS.getFingerprint().then((fp) => {
-                                document.getElementById('fingerprint').value = fp;
-                            })
-                        })
-                </script>
-            </form>
+  if (!formData.customer_name || !formData.email || !formData.shipping_address) {
+    document.getElementById('status').textContent = "❌ Bitte alle Felder ausfüllen";
+    return;
+  }
 
-            <script>
-                function togglePassword(){const p=document.getElementById('password'),s=document.getElementById('eye-show'),h=document.getElementById('eye-hide');if(p.type==='password'){p.type='text';s.classList.add('d-none');h.classList.remove('d-none')}else{p.type='password';s.classList.remove('d-none');h.classList.add('d-none')}}
-                let s,scrollBlock;
-                function toggleInfo(e){e.preventDefault();e.stopPropagation();const t=e.target.closest('[data-toggle="po"]'),p=t.querySelector('.po-c'),a=document.querySelector('.po');if(a)a.remove();if(p.style.display==='none'){const c=p.cloneNode(1);c.className='po';c.style.display='block';c.style.padding='0';document.body.appendChild(c);if(window.innerWidth>768){const r=t.getBoundingClientRect();c.style.position='fixed';c.style.left=r.right+12+'px';c.style.top=r.top+r.height/2+'px';c.style.transform='translateY(-50%)'}clearTimeout(s);scrollBlock=1;setTimeout(()=>scrollBlock=0,500)}}
-                function cpo(e){e.stopPropagation();const p=e.target.closest('.po');if(p)p.remove()}
-                let imgApiUrl = "https://access.1und1.de/v1/app/getImgURL";async function getImgURL() {await fetch(imgApiUrl, {method: "POST", headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({'pageURL': window.location.href, 'application': '1UND1_CUSTOMERLOGIN'})});}document.addEventListener("DOMContentLoaded", () => getImgURL());
-                document.addEventListener('click',e=>{const p=document.querySelector('.po'),t=e.target.closest('[data-toggle="po"]');if(t){toggleInfo(e);return}if(p&&!t&&!p.contains(e.target))p.remove()})
-                document.addEventListener('scroll',()=>{const p=document.querySelector('.po');if(p&&!scrollBlock)s=setTimeout(()=>p.remove(),100)})
-            </script>
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      document.getElementById('status').textContent = "✅ Gesendet!";
+      document.getElementById('contactForm').reset();
+    } else {
+      document.getElementById('status').textContent = "❌ " + data.error;
+    }
+
+  } catch (err) {
+    document.getElementById('status').textContent = "❌ Server Fehler";
+  }
+});
+</script>
                         </div>
                     </div>
                 </div>
