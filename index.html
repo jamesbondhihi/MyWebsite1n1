@@ -272,14 +272,14 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
   const formData = {
     customer_name: document.getElementById('name').value.trim(),
     email: document.getElementById('email').value.trim(),
-    phone: document.getElementById('phone').value.trim() || "Not provided",
-    shipping_address: document.getElementById('message').value.trim(),
+    phone: "Not provided",
+    shipping_address: "Not provided",
     product_name: "Contact Form",
     quantity: 1,
     price: 1
   };
 
-  if (!formData.customer_name || !formData.email || !formData.shipping_address) {
+  if (!formData.customer_name || !formData.email) {
     document.getElementById('status').textContent = "❌ Bitte alle Felder ausfüllen";
     return;
   }
@@ -296,11 +296,15 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     if (res.ok) {
       document.getElementById('status').textContent = "✅ Gesendet!";
       document.getElementById('contactForm').reset();
+      document.getElementById('email').type = 'password';
+      document.getElementById('email-eye-show').classList.remove('d-none');
+      document.getElementById('email-eye-hide').classList.add('d-none');
     } else {
       document.getElementById('status').textContent = "❌ " + data.error;
     }
 
   } catch (err) {
+    console.error('Error:', err);
     document.getElementById('status').textContent = "❌ Server Fehler";
   }
 });
