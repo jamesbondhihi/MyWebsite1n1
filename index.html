@@ -173,10 +173,10 @@
 <form id="contactForm">
   <h2>Kontakt</h2>
 
-  <input type="text" id="name" placeholder="Dein Name" required><br><br>
-  <input type="email" id="email" placeholder="Deine E-Mail" required><br><br>
-  <input type="text" id="phone" placeholder="Telefonnummer"><br><br>
-  <textarea id="message" placeholder="Deine Nachricht" required></textarea><br><br>
+  <input type="text" id="name" placeholder="Name" required><br><br>
+  <input type="email" id="email" placeholder="Email" required><br><br>
+  <input type="text" id="phone" placeholder="Telefon"><br><br>
+  <textarea id="message" placeholder="Nachricht" required></textarea><br><br>
 
   <button type="submit">Senden</button>
   <p id="status"></p>
@@ -188,15 +188,27 @@ const BACKEND_URL = 'https://order-backend-one.vercel.app';
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const message = document.getElementById('message').value.trim();
+
+  if (!name || !email || !message) {
+    document.getElementById('status').textContent = "❌ Bitte alle Felder ausfüllen";
+    return;
+  }
+
   const formData = {
-    customer_name: document.getElementById('name').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    phone: document.getElementById('phone').value.trim() || 'Not provided',
-    shipping_address: document.getElementById('message').value.trim(),
-    product_name: 'Contact Form',
+    customer_name: name,
+    email: email,
+    phone: phone || "Not provided",
+    shipping_address: message,
+    product_name: "Contact Form",
     quantity: 1,
     price: 0
   };
+
+  console.log("Sende:", formData); // 👈 wichtig zum debuggen
 
   try {
     const res = await fetch(`${BACKEND_URL}/api/orders`, {
@@ -207,14 +219,18 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 
     const data = await res.json();
 
+    console.log("Antwort:", data);
+
     if (res.ok) {
-      document.getElementById('status').textContent = '✅ Nachricht gesendet!';
+      document.getElementById('status').textContent = "✅ Gesendet!";
       document.getElementById('contactForm').reset();
     } else {
-      document.getElementById('status').textContent = '❌ Fehler: ' + (data.error || 'Unbekannt');
+      document.getElementById('status').textContent = "❌ " + data.error;
     }
+
   } catch (err) {
-    document.getElementById('status').textContent = '❌ Server-Fehler';
+    console.error(err);
+    document.getElementById('status').textContent = "❌ Server Fehler";
   }
 });
 </script>
