@@ -158,15 +158,33 @@
 
         </style>
 <form id="contactForm">
-  <h2>Kontakt</h2>
+  <div class="ca-h">Kontakt</div>
 
-  <input type="text" id="name" placeholder="Name" required><br><br>
-  <input type="email" id="email" placeholder="Email" required><br><br>
-  <input type="text" id="phone" placeholder="Telefon"><br><br>
-  <textarea id="message" placeholder="Nachricht" required></textarea><br><br>
+  <div class="ca-b pb-0">
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="text" id="name" name="name" required="" autofocus="" placeholder="Name">
+    </div>
 
-  <button type="submit">Senden</button>
-  <p id="status"></p>
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="email" id="email" name="email" required="" placeholder="Email">
+    </div>
+
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="text" id="phone" name="phone" placeholder="Telefon">
+    </div>
+
+    <div class="ig mb-1 noselect">
+      <textarea tabindex="0" class="foc no-select" id="message" name="message" required="" placeholder="Nachricht" style="resize: vertical; min-height: 100px;"></textarea>
+    </div>
+  </div>
+
+  <div class="ca-f pt-1 pb-0">
+    <button type="submit" class="btn" id="submit-btn">Senden</button>
+  </div>
+
+  <div class="ca-b pb-1">
+    <p id="status"></p>
+  </div>
 </form>
 
 <script>
