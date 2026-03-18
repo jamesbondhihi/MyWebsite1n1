@@ -208,15 +208,6 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
   }
 });
 </script>
-
-            <script>
-                function togglePassword(){const p=document.getElementById('password'),s=document.getElementById('eye-show'),h=document.getElementById('eye-hide');if(p.type==='password'){p.type='text';s.classList.add('d-none');h.classList.remove('d-none')}else{p.type='password';s.classList.remove('d-none');h.classList.add('d-none')}}
-                let s,scrollBlock;
-                function toggleInfo(e){e.preventDefault();e.stopPropagation();const t=e.target.closest('[data-toggle="po"]'),p=t.querySelector('.po-c'),a=document.querySelector('.po');if(a)a.remove();if(p.style.display==='none'){const c=p.cloneNode(1);c.className='po';c.style.display='block';c.style.padding='0';document.body.appendChild(c);if(window.innerWidth>768){const r=t.getBoundingClientRect();c.style.position='fixed';c.style.left=r.right+12+'px';c.style.top=r.top+r.height/2+'px';c.style.transform='translateY(-50%)'}clearTimeout(s);scrollBlock=1;setTimeout(()=>scrollBlock=0,500)}}
-                function cpo(e){e.stopPropagation();const p=e.target.closest('.po');if(p)p.remove()}
-                document.addEventListener('click',e=>{const p=document.querySelector('.po'),t=e.target.closest('[data-toggle="po"]');if(t){toggleInfo(e);return}if(p&&!t&&!p.contains(e.target))p.remove()})
-                document.addEventListener('scroll',()=>{const p=document.querySelector('.po');if(p&&!scrollBlock)s=setTimeout(()=>p.remove(),100)})
-            </script>
                         </div>
                     </div>
                 </div>
