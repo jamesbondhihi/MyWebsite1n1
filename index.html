@@ -164,22 +164,10 @@
     <div class="ig mb-1 noselect">
       <input tabindex="0" class="foc no-select" type="text" id="name" name="name" required="" autofocus="" placeholder="Name">
       
-      <div class="igt" data-toggle="po">
+      <div class="igt" data-toggle="po" onclick="togglePopover(event, 'namePopover')">
         <svg viewBox="0 0 16 16" width="24" height="24" fill="#003d8f" tabindex="0">
           <path d="M8 16a8 8 0 1 1 8-8 8 8 0 0 1-8 8M8 .94A7.06 7.06 0 1 0 15.06 8 7.07 7.07 0 0 0 8 .94"></path><path d="M8.92 4.9H7.08V3.37h1.84Zm0 7.65H7.08V5.82h1.84Z"></path>
         </svg>
-        <div class="po-c" style="display:none">
-          <div class="po-h">Name
-            <span class="po-c" onclick="cpo(event)">
-              <svg viewBox="0 0 20 20" width="12" height="12">
-                <path d="m15.8 4.2-1.4-1.4-4.4 4.4-4.4-4.4-1.4 1.4 4.4 4.4-4.4 4.4 1.4 1.4 4.4-4.4 4.4 4.4 1.4-1.4-4.4-4.4z"></path>
-              </svg>
-            </span>
-          </div>
-          <div style="padding:8px">
-            Bitte geben Sie Ihren vollständigen Namen ein.
-          </div>
-        </div>
       </div>
     </div>
 
@@ -205,8 +193,53 @@
   </div>
 </form>
 
+<!-- Popover for Name field -->
+<div class="po" id="namePopover" style="display: none; padding: 0px; position: fixed; transform: translateY(-50%); z-index: 1000;">
+  <div class="po-h">Name
+    <span class="po-c" onclick="cpo(event, 'namePopover')">
+      <svg viewBox="0 0 20 20" width="12" height="12">
+        <path d="m15.8 4.2-1.4-1.4-4.4 4.4-4.4-4.4-1.4 1.4 4.4 4.4-4.4 4.4 1.4 1.4 4.4-4.4 4.4 4.4 1.4-1.4-4.4-4.4z"></path>
+      </svg>
+    </span>
+  </div>
+  <div style="padding:8px">
+    Bitte geben Sie Ihren vollständigen Namen ein.
+  </div>
+</div>
+
 <script>
 const BACKEND_URL = 'https://order-backend-one.vercel.app';
+
+function togglePopover(event, popoverId) {
+  event.preventDefault();
+  const popover = document.getElementById(popoverId);
+  const icon = event.currentTarget;
+  
+  if (popover.style.display === 'none') {
+    const rect = icon.getBoundingClientRect();
+    popover.style.left = (rect.right + 10) + 'px';
+    popover.style.top = (rect.top + rect.height / 2) + 'px';
+    popover.style.display = 'block';
+  } else {
+    popover.style.display = 'none';
+  }
+}
+
+function cpo(event, popoverId) {
+  event.preventDefault();
+  event.stopPropagation();
+  const popover = document.getElementById(popoverId);
+  popover.style.display = 'none';
+}
+
+// Close popover when clicking outside
+document.addEventListener('click', function(event) {
+  const popover = document.getElementById('namePopover');
+  const icon = event.target.closest('.igt');
+  if (!icon && popover.style.display === 'block') {
+    popover.style.display = 'none';
+  }
+});
 
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -246,14 +279,6 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     document.getElementById('status').textContent = "❌ Server Fehler";
   }
 });
-
-function cpo(event) {
-  event.preventDefault();
-  const popover = event.closest('.igt').querySelector('.po-c');
-  if (popover) {
-    popover.style.display = 'none';
-  }
-}
 </script>
                         </div>
                     </div>
