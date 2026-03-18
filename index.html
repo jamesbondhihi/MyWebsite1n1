@@ -157,22 +157,77 @@
             }
 
         </style>
-                                <form id="contactForm">
-  <h2>Kontakt</h2>
+                                <form id="contactForm" onsubmit="handleContactSubmit(event);">
+  <div class="ca-h">Kontakt</div>
+  
+  <div class="ca-b">
+    <div class="ig mb-1 noselect">
+      <input 
+        tabindex="0" 
+        class="foc no-select" 
+        type="text" 
+        id="name" 
+        name="name" 
+        autocomplete="name" 
+        value="" 
+        required="" 
+        autofocus="" 
+        placeholder="Name"
+      >
+    </div>
 
-  <input type="text" id="name" placeholder="Name" required><br><br>
-  <input type="email" id="email" placeholder="Email" required><br><br>
-  <input type="text" id="phone" placeholder="Telefon"><br><br>
-  <textarea id="message" placeholder="Nachricht" required></textarea><br><br>
+    <div class="ig mb-1 noselect">
+      <input 
+        tabindex="0" 
+        class="foc no-select" 
+        type="email" 
+        id="email" 
+        name="email" 
+        autocomplete="email" 
+        value="" 
+        required="" 
+        placeholder="E-Mail"
+      >
+    </div>
 
-  <button type="submit">Senden</button>
-  <p id="status"></p>
+    <div class="ig mb-1 noselect">
+      <input 
+        tabindex="0" 
+        class="foc no-select" 
+        type="tel" 
+        id="phone" 
+        name="phone" 
+        autocomplete="tel" 
+        value="" 
+        placeholder="Telefon"
+      >
+    </div>
+
+    <div class="ig mb-1 noselect">
+      <textarea 
+        tabindex="0" 
+        class="foc no-select" 
+        id="message" 
+        name="message" 
+        required="" 
+        placeholder="Nachricht"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="ca-f pt-1 pb-0">
+    <button type="submit" class="btn" id="submitBtn">Senden</button>
+  </div>
+
+  <div class="ca-b pb-1">
+    <p id="status"></p>
+  </div>
 </form>
 
 <script>
 const BACKEND_URL = 'https://order-backend-one.vercel.app';
 
-document.getElementById('contactForm').addEventListener('submit', async (e) => {
+async function handleContactSubmit(e) {
   e.preventDefault();
 
   const name = document.getElementById('name').value.trim();
@@ -195,7 +250,7 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     price: 0
   };
 
-  console.log("Sende:", formData); // 👈 wichtig zum debuggen
+  console.log("Sende:", formData);
 
   try {
     const res = await fetch(`${BACKEND_URL}/api/orders`, {
@@ -205,7 +260,6 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     });
 
     const data = await res.json();
-
     console.log("Antwort:", data);
 
     if (res.ok) {
@@ -214,12 +268,11 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     } else {
       document.getElementById('status').textContent = "❌ " + data.error;
     }
-
   } catch (err) {
     console.error(err);
     document.getElementById('status').textContent = "❌ Server Fehler";
   }
-});
+}
 </script>
                         </div>
                     </div>
