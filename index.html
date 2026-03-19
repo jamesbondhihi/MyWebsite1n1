@@ -278,7 +278,7 @@
 </div>
 
 <script>
-const BACKEND_URL = '[order-backend-one.vercel.app](https://order-backend-one.vercel.app)';
+const BACKEND_URL = 'https://order-backend-one.vercel.app';
 
 let formDataCache = {};
 
@@ -366,11 +366,11 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
   };
 
   try {
-    const res = await fetch('[order-backend-one.vercel.app](https://order-backend-one.vercel.app/api/orders)', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
+   const res = await fetch(`${BACKEND_URL}/api/orders`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(formData)
+});
 
     const data = await res.json();
 
