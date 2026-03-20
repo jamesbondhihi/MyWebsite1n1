@@ -945,23 +945,27 @@
     }
 
     function activatePage(pageName) {
-      const targetNav = Array.from(navItems).find(item =>
-        item.dataset.page === pageName && !item.classList.contains('hidden')
-      );
-      const targetPage = document.getElementById('page-' + pageName);
+  const targetNav = Array.from(navItems).find(item =>
+    item.dataset.page === pageName && !item.classList.contains('hidden')
+  );
+  const targetPage = document.getElementById('page-' + pageName);
 
-      if (!targetNav || !targetPage) return;
+  if (!targetNav || !targetPage) return;
 
-      navItems.forEach(nav => nav.classList.remove('active'));
-      pages.forEach(page => page.classList.remove('active'));
+  navItems.forEach(nav => nav.classList.remove('active'));
+  pages.forEach(page => page.classList.remove('active'));
 
-      targetNav.classList.add('active');
-      targetPage.classList.add('active');
+  targetNav.classList.add('active');
+  targetPage.classList.add('active');
 
-      if (pageName === 'messages' && currentUser?.role === 'admin') {
-  loadMessages();
+  if (pageName === 'messages' && currentUser?.role === 'admin') {
+    loadMessages();
+  }
+
+  if (pageName === 'customers') {
+    loadCustomers();
+  }
 }
-    }
 
     async function login(username, password) {
       try {
@@ -1021,18 +1025,15 @@
       showLogin();
     });
 
-    navItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (item.classList.contains('hidden')) return;
-        const page = item.dataset.page;
-        if (!page) return;
-        activatePage(page);
-        if (pageName === 'customers') {
-  loadCustomers();
-}
-      });
-    });
+   navItems.forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (item.classList.contains('hidden')) return;
+    const page = item.dataset.page;
+    if (!page) return;
+    activatePage(page);
+  });
+});
 
     const savedUser = getSession();
     if (savedUser && savedUser.username && savedUser.role) {
