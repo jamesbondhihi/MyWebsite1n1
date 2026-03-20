@@ -52,185 +52,234 @@
     .chart-line { position: absolute; left: 20px; right: 20px; bottom: 20px; height: 70px; }
     .chart-line svg { width: 100%; height: 100%; }
     .footer-note { color: #6f83ad; margin-top: 18px; font-size: 12px; }
+    html, body {
+  min-height: 100%;
+}
+
+body {
+  padding: 0;
+  background:
+    radial-gradient(circle at 75% 35%, rgba(42, 95, 255, 0.18), transparent 22%),
+    radial-gradient(circle at 90% 95%, rgba(121, 66, 255, 0.18), transparent 18%),
+    #070b16;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: linear-gradient(180deg, #0b1020 0%, #080d19 100%);
+  border-right: 1px solid #16213b;
+  padding: 26px 18px;
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #eef4ff;
+  margin-bottom: 2px;
+}
+
+.brand-sub {
+  color: #7f92bc;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  margin-bottom: 26px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-section {
+  color: #5f739f;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  padding: 0 10px;
+}
+
+.nav-item {
+  display: block;
+  text-decoration: none;
+  color: #b8c7ea;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #10192d;
+  color: #eef4ff;
+}
+
+.nav-item.active {
+  background: linear-gradient(180deg, #182449 0%, #121c38 100%);
+  border: 1px solid #24365d;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 28px;
+}
+
+.container {
+  max-width: none;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #16213b;
+  }
+
+  .main-content {
+    padding: 18px;
+  }
+}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="title">Overview</div>
-    <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">WESHKY</div>
+      <div class="brand-sub">LIVE</div>
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-label">Total Requests</div>
-        <div class="stat-value">349</div>
-        <div class="stat-change">+18% this week</div>
+      <nav class="nav">
+        <div class="nav-section">Main</div>
+        <a href="#" class="nav-item active">Dashboard</a>
+        <a href="#" class="nav-item">Analytics</a>
+        <a href="#" class="nav-item">Messages</a>
+        <a href="#" class="nav-item">Orders</a>
+        <a href="#" class="nav-item">Customers</a>
+
+        <div class="nav-section">Management</div>
+        <a href="#" class="nav-item">Reports</a>
+        <a href="#" class="nav-item">Sessions</a>
+        <a href="#" class="nav-item">Domains</a>
+        <a href="#" class="nav-item">Integrations</a>
+
+        <div class="nav-section">System</div>
+        <a href="#" class="nav-item">Settings</a>
+        <a href="#" class="nav-item">Billing</a>
+        <a href="#" class="nav-item">Logs</a>
+        <a href="#" class="nav-item">Support</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="container">
+        <div class="title">Overview</div>
+        <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-label">Total Requests</div>
+            <div class="stat-value">349</div>
+            <div class="stat-change">+18% this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Today</div>
+            <div class="stat-value">117</div>
+            <div class="stat-change">+25.7% in last 24h</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Sessions</div>
+            <div class="stat-value">12</div>
+            <div class="stat-change">Live right now</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Open Tickets</div>
+            <div class="stat-value">7</div>
+            <div class="stat-change" style="color:#f59e0b;">Needs review</div>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <div class="stat-label">Traffic Trend</div>
+          <div class="chart-line">
+            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+              <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
+                points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="section-title">Recent Activity</div>
+
+        <div class="visitors">
+          <div class="visitor-card">
+            <div class="badge">Just now</div>
+            <div class="row"><div class="label">Project</div><div class="value">example.org</div></div>
+            <div class="row"><div class="label">Region</div><div class="value">Shanghai, China</div></div>
+            <div class="row"><div class="label">Browser</div><div class="value">Edge on Windows</div></div>
+            <div class="row"><div class="label">Current Page</div><div class="value">/pricing</div></div>
+            <div class="divider"></div>
+            <div class="panel-title">Health Signals</div>
+            <div class="risk-row">
+              <span class="risk-label">Load</span>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:72%; background:#60a5fa;"></div></div>
+              <span class="risk-val" style="color:#93c5fd;">72%</span>
+            </div>
+            <div class="risk-row">
+              <span class="risk-label">Errors</span>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:18%; background:#f59e0b;"></div></div>
+              <span class="risk-val" style="color:#fbbf24;">18%</span>
+            </div>
+            <div class="verdict-row">
+              <button class="btn btn-detail">View details</button>
+              <button class="btn btn-detail">Archive</button>
+            </div>
+          </div>
+
+          <div class="visitor-card">
+            <div class="badge">2 minutes ago</div>
+            <div class="row"><div class="label">Project</div><div class="value">mysite.app</div></div>
+            <div class="row"><div class="label">Region</div><div class="value">Berlin, Germany</div></div>
+            <div class="row"><div class="label">Browser</div><div class="value">Chrome on macOS</div></div>
+            <div class="row"><div class="label">Current Page</div><div class="value">/contact</div></div>
+            <div class="divider"></div>
+            <div class="panel-title">Health Signals</div>
+            <div class="risk-row">
+              <span class="risk-label">Load</span>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:24%; background:#22c55e;"></div></div>
+              <span class="risk-val" style="color:#6ee7a0;">24%</span>
+            </div>
+            <div class="risk-row">
+              <span class="risk-label">Errors</span>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:5%; background:#22c55e;"></div></div>
+              <span class="risk-val" style="color:#6ee7a0;">5%</span>
+            </div>
+            <div class="verdict-row">
+              <button class="btn btn-detail">View details</button>
+              <button class="btn btn-detail">Archive</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Today</div>
-        <div class="stat-value">117</div>
-        <div class="stat-change">+25.7% in last 24h</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Active Sessions</div>
-        <div class="stat-value">12</div>
-        <div class="stat-change">Live right now</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Pending Review</div>
-        <div class="stat-value" id="pending-count">2</div>
-        <div class="stat-change" style="color:#f59e0b;">Awaiting decision</div>
-      </div>
-    </div>
-
-    <div class="chart-box">
-      <div class="stat-label">Traffic Trend</div>
-      <div class="chart-line">
-        <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-          <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
-            points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="section-title">Recent Visitors</div>
-
-    <div class="visitors">
-
-      <!-- Visitor 1 -->
-      <div class="visitor-card" id="card-1">
-        <div class="badge">Just now</div>
-        <div class="row"><div class="label">Domain</div><div class="value">example.org</div></div>
-        <div class="row"><div class="label">Location</div><div class="value">Shanghai, China</div></div>
-        <div class="row"><div class="label">IP Address</div><div class="value">180.153.236.120</div></div>
-        <div class="row"><div class="label">Browser</div><div class="value">Edge on Windows</div></div>
-        <div class="row"><div class="label">Current Page</div><div class="value">/pricing</div></div>
-
-        <div class="divider"></div>
-        <div class="panel-title">Risk Signals</div>
-        <div class="risk-row">
-          <span class="risk-label">Threat</span>
-          <div class="risk-bar-bg"><div class="risk-bar" style="width:72%; background:#ef4444;"></div></div>
-          <span class="risk-val" style="color:#f87171;">72%</span>
-        </div>
-        <div class="risk-row">
-          <span class="risk-label">Bot score</span>
-          <div class="risk-bar-bg"><div class="risk-bar" style="width:58%; background:#f59e0b;"></div></div>
-          <span class="risk-val" style="color:#fbbf24;">58%</span>
-        </div>
-        <div class="risk-row">
-          <span class="risk-label">VPN</span>
-          <div class="risk-bar-bg"><div class="risk-bar" style="width:90%; background:#ef4444;"></div></div>
-          <span class="risk-val" style="color:#f87171;">90%</span>
-        </div>
-
-        <div class="divider"></div>
-        <div class="panel-title">Access Decision</div>
-        <div class="verdict-row">
-          <button class="btn btn-approve" onclick="decide(1,'approved')">Approve</button>
-          <button class="btn btn-deny" onclick="decide(1,'denied')">Deny</button>
-        </div>
-        <div class="verdict-row">
-          <button class="btn btn-detail" onclick="decide(1,'detail')">View details</button>
-          <button class="btn btn-block" onclick="decide(1,'block')">Block IP</button>
-        </div>
-        <div class="status-banner" id="banner-1">
-          <div class="dot" id="dot-1"></div>
-          <span id="banner-text-1"></span>
-        </div>
-      </div>
-
-      <!-- Visitor 2 -->
-      <div class="visitor-card" id="card-2">
-        <div class="badge">2 minutes ago</div>
-        <div class="row"><div class="label">Domain</div><div class="value">mysite.app</div></div>
-        <div class="row"><div class="label">Location</div><div class="value">Berlin, Germany</div></div>
-        <div class="row"><div class="label">IP Address</div><div class="value">91.12.100.45</div></div>
-        <div class="row"><div class="label">Browser</div><div class="value">Chrome on macOS</div></div>
-        <div class="row"><div class="label">Current Page</div><div class="value">/contact</div></div>
-
-        <div class="divider"></div>
-        <div class="panel-title">Risk Signals</div>
-        <div class="risk-row">
-          <span class="risk-label">Threat</span>
-          <div class="risk-bar-bg"><div class="risk-bar" style="width:8%; background:#22c55e;"></div></div>
-          <span class="risk-val" style="color:#6ee7a0;">8%</span>
-        </div>
-        <div class="risk-row">
-          <span class="risk-label">Bot score</span>
-          <div class="risk-bar-bg"><div class="risk-bar" style="width:12%; background:#22c55e;"></div></div>
-          <span class="risk-val" style="color:#6ee7a0;">12%</span>
-        </div>
-        <div class="risk-row">
-          <span class="risk-label">VPN</span>
-          <div class="risk-bar-bg"><div class="risk-bar" style="width:5%; background:#22c55e;"></div></div>
-          <span class="risk-val" style="color:#6ee7a0;">5%</span>
-        </div>
-
-        <div class="divider"></div>
-        <div class="panel-title">Access Decision</div>
-        <div class="verdict-row">
-          <button class="btn btn-approve" onclick="decide(2,'approved')">Approve</button>
-          <button class="btn btn-deny" onclick="decide(2,'denied')">Deny</button>
-        </div>
-        <div class="verdict-row">
-          <button class="btn btn-detail" onclick="decide(2,'detail')">View details</button>
-          <button class="btn btn-block" onclick="decide(2,'block')">Block IP</button>
-        </div>
-        <div class="status-banner" id="banner-2">
-          <div class="dot" id="dot-2"></div>
-          <span id="banner-text-2"></span>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="footer-note">Demo layout only — connect it to your own backend or analytics source.</div>
+    </main>
   </div>
-
-  <script>
-    let pending = 2;
-    const decided = new Set();
-
-    function decide(id, action) {
-      const card = document.getElementById('card-' + id);
-      const banner = document.getElementById('banner-' + id);
-      const dot = document.getElementById('dot-' + id);
-      const text = document.getElementById('banner-text-' + id);
-
-      banner.className = 'status-banner show';
-
-      if (action === 'approved') {
-        card.className = 'visitor-card approved';
-        dot.className = 'dot dot-approve';
-        text.textContent = 'Access approved — session allowed';
-        banner.className = 'status-banner show approved';
-        updatePending(id);
-      } else if (action === 'denied') {
-        card.className = 'visitor-card denied';
-        dot.className = 'dot dot-deny';
-        text.textContent = 'Access denied — session blocked';
-        banner.className = 'status-banner show denied';
-        updatePending(id);
-      } else if (action === 'block') {
-        card.className = 'visitor-card denied';
-        dot.className = 'dot dot-deny';
-        text.textContent = 'IP address added to blocklist';
-        banner.className = 'status-banner show denied';
-        updatePending(id);
-      } else if (action === 'detail') {
-        banner.className = 'status-banner show approved';
-        dot.className = 'dot dot-approve';
-        text.textContent = 'Full session log opened in new tab';
-      }
-    }
-
-    function updatePending(id) {
-      if (!decided.has(id)) {
-        decided.add(id);
-        pending = Math.max(0, pending - 1);
-        document.getElementById('pending-count').textContent = pending;
-      }
-    }
-  </script>
 </body>
 </html>
