@@ -198,7 +198,8 @@
     .stat-card,
     .visitor-card,
     .chart-box,
-    .login-card {
+    .login-card,
+    .message-wrapper {
       background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
       border: 1px solid #1a2744;
       border-radius: 18px;
@@ -243,7 +244,6 @@
 
     .visitor-card {
       padding: 18px;
-      transition: border-color 0.3s;
     }
 
     .badge {
@@ -475,6 +475,10 @@
       text-align: center;
     }
 
+    .message-wrapper {
+      padding: 18px;
+    }
+
     .message-item {
       padding: 16px 0;
       border-bottom: 1px solid #1a2744;
@@ -560,6 +564,22 @@
       border: 1px solid #1a2744;
       border-radius: 18px;
       padding: 20px;
+      transition: 0.2s ease;
+    }
+
+    .customer-card:hover {
+      border-color: #2a3f69;
+    }
+
+    .customer-card.reviewed {
+      opacity: 0.55;
+      filter: grayscale(0.18);
+      border-color: #39507a;
+    }
+
+    .customer-card.reviewed input,
+    .customer-card.reviewed textarea {
+      pointer-events: none;
     }
 
     .customer-name-input,
@@ -598,14 +618,44 @@
       letter-spacing: 0.08em;
     }
 
+    .customer-display-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #edf3ff;
+      margin-bottom: 14px;
+      word-break: break-word;
+    }
+
+    .customer-display-field {
+      margin-bottom: 12px;
+    }
+
+    .customer-display-label {
+      font-size: 11px;
+      color: #8ea0c9;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .customer-display-value {
+      font-size: 14px;
+      color: #d7e2ff;
+      word-break: break-word;
+      line-height: 1.45;
+    }
+
     .customer-card-actions {
       display: flex;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
     }
 
     .customer-save-btn,
-    .customer-delete-btn {
+    .customer-delete-btn,
+    .customer-copy-btn,
+    .customer-review-btn {
       flex: 1;
       border: none;
       border-radius: 12px;
@@ -613,6 +663,7 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      min-width: 120px;
     }
 
     .customer-save-btn {
@@ -633,6 +684,44 @@
 
     .customer-delete-btn:hover {
       background: #4a1515;
+    }
+
+    .customer-copy-btn {
+      background: #102238;
+      color: #9cd1ff;
+      border: 1px solid #21476d;
+    }
+
+    .customer-copy-btn:hover {
+      background: #14304f;
+    }
+
+    .customer-review-btn {
+      background: #131c31;
+      color: #d5def3;
+      border: 1px solid #26395f;
+    }
+
+    .customer-review-btn:hover:enabled {
+      background: #182441;
+    }
+
+    .customer-review-btn:disabled {
+      opacity: 0.75;
+      cursor: default;
+    }
+
+    .customer-status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #6ee7a0;
+      display: none;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .customer-status.show {
+      display: block;
     }
 
     @media (max-width: 900px) {
@@ -811,7 +900,7 @@
 
         <section id="page-customers" class="page">
           <div class="title">Customers</div>
-          <div class="subtitle">Create and manage customer cards manually.</div>
+          <div class="subtitle">Admin can create cards. Staff can only view and mark them as edited.</div>
 
           <div class="customers-toolbar">
             <button id="add-customer-btn" class="add-customer-btn">+ Add Customer</button>
@@ -824,7 +913,7 @@
           <div class="title">Messages</div>
           <div class="subtitle">Orders loaded from your database.</div>
 
-          <div class="stat-card">
+          <div class="message-wrapper">
             <div id="messages-list" style="color:#b8c7ea;">Loading messages...</div>
           </div>
         </section>
@@ -946,6 +1035,10 @@
       if (pageName === 'messages' && currentUser?.role === 'admin') {
         loadMessages();
       }
+
+      if (pageName === 'customers') {
+        rerenderCustomers();
+      }
     }
 
     async function login(username, password) {
@@ -989,6 +1082,14 @@
 
       applyRolePermissions(currentUser.role);
       showApp();
+
+      if (currentUser.role === 'staff') {
+        addCustomerBtn.classList.add('hidden');
+      } else {
+        addCustomerBtn.classList.remove('hidden');
+      }
+
+      rerenderCustomers();
       activatePage('dashboard');
     }
 
@@ -1116,26 +1217,112 @@
         .replaceAll("'", '&#039;');
     }
 
-    function createCustomerCard(data = {}) {
+    function escapeAttribute(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('"', '&quot;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+    }
+
+    function getStoredCustomers() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('jaynex_customers') || '[]');
+        return Array.isArray(saved) ? saved : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCustomers(customers) {
+      localStorage.setItem('jaynex_customers', JSON.stringify(customers));
+    }
+
+    function getCustomerCopyText(customer) {
+      return [
+        `Name: ${customer.name || ''}`,
+        `Address: ${customer.address || ''}`,
+        `Email: ${customer.email || ''}`,
+        `Phone: ${customer.phone || ''}`
+      ].join('\n');
+    }
+
+    async function copyCustomer(customer, button) {
+      const text = getCustomerCopyText(customer);
+
+      try {
+        await navigator.clipboard.writeText(text);
+        if (button) {
+          const original = button.textContent;
+          button.textContent = 'Copied';
+          setTimeout(() => {
+            button.textContent = original;
+          }, 1200);
+        }
+      } catch (err) {
+        console.error('COPY ERROR:', err);
+      }
+    }
+
+    function renderAdminCustomerCard(customer, index) {
       const card = document.createElement('div');
       card.className = 'customer-card';
 
+      if (customer.saved) {
+        card.innerHTML = `
+          <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Address</div>
+            <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Email</div>
+            <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Phone</div>
+            <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
+          </div>
+
+          <div class="customer-card-actions">
+            <button class="customer-delete-btn" type="button">Delete</button>
+            <button class="customer-copy-btn" type="button">Copy</button>
+          </div>
+        `;
+
+        card.querySelector('.customer-delete-btn').addEventListener('click', () => {
+          const customers = getStoredCustomers();
+          customers.splice(index, 1);
+          saveCustomers(customers);
+          rerenderCustomers();
+        });
+
+        card.querySelector('.customer-copy-btn').addEventListener('click', (e) => {
+          copyCustomer(customer, e.currentTarget);
+        });
+
+        return card;
+      }
+
       card.innerHTML = `
-        <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeHtml(data.name || '')}" />
+        <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeAttribute(customer.name || '')}" />
 
         <div class="customer-field">
           <div class="customer-label">Address</div>
-          <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeHtml(data.address || '')}" />
+          <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" />
         </div>
 
         <div class="customer-field">
           <div class="customer-label">Email</div>
-          <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeHtml(data.email || '')}" />
+          <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" />
         </div>
 
         <div class="customer-field">
           <div class="customer-label">Phone</div>
-          <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeHtml(data.phone || '')}" />
+          <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" />
         </div>
 
         <div class="customer-card-actions">
@@ -1144,59 +1331,132 @@
         </div>
       `;
 
+      const nameInput = card.querySelector('.customer-name-input');
+      const addressInput = card.querySelector('.customer-address');
+      const emailInput = card.querySelector('.customer-email');
+      const phoneInput = card.querySelector('.customer-phone');
       const saveBtn = card.querySelector('.customer-save-btn');
       const deleteBtn = card.querySelector('.customer-delete-btn');
 
+      function persistDraft() {
+        const customers = getStoredCustomers();
+        customers[index] = {
+          ...customers[index],
+          name: nameInput.value,
+          address: addressInput.value,
+          email: emailInput.value,
+          phone: phoneInput.value,
+          saved: false,
+          reviewed: false
+        };
+        saveCustomers(customers);
+      }
+
+      [nameInput, addressInput, emailInput, phoneInput].forEach(input => {
+        input.addEventListener('input', persistDraft);
+      });
+
       saveBtn.addEventListener('click', () => {
-        saveCustomersToLocalStorage();
+        const customers = getStoredCustomers();
+        customers[index] = {
+          name: nameInput.value.trim(),
+          address: addressInput.value.trim(),
+          email: emailInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          saved: true,
+          reviewed: false
+        };
+        saveCustomers(customers);
+        rerenderCustomers();
       });
 
       deleteBtn.addEventListener('click', () => {
-        card.remove();
-        saveCustomersToLocalStorage();
+        const customers = getStoredCustomers();
+        customers.splice(index, 1);
+        saveCustomers(customers);
+        rerenderCustomers();
       });
 
-      const inputs = card.querySelectorAll('input');
-      inputs.forEach(input => {
-        input.addEventListener('input', () => {
-          saveCustomersToLocalStorage();
-        });
+      return card;
+    }
+
+    function renderStaffCustomerCard(customer, index) {
+      const card = document.createElement('div');
+      card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
+
+      card.innerHTML = `
+        <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
+
+        <div class="customer-display-field">
+          <div class="customer-display-label">Address</div>
+          <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
+        </div>
+
+        <div class="customer-display-field">
+          <div class="customer-display-label">Email</div>
+          <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
+        </div>
+
+        <div class="customer-display-field">
+          <div class="customer-display-label">Phone</div>
+          <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
+        </div>
+
+        <div class="customer-card-actions">
+          <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>
+            ${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}
+          </button>
+          <button class="customer-copy-btn" type="button">Copy</button>
+        </div>
+
+        <div class="customer-status ${customer.reviewed ? 'show' : ''}">Bearbeitet</div>
+      `;
+
+      const reviewBtn = card.querySelector('.customer-review-btn');
+      const copyBtn = card.querySelector('.customer-copy-btn');
+
+      reviewBtn.addEventListener('click', () => {
+        const customers = getStoredCustomers();
+        if (!customers[index]) return;
+        customers[index].reviewed = true;
+        saveCustomers(customers);
+        rerenderCustomers();
       });
 
-      customersList.appendChild(card);
+      copyBtn.addEventListener('click', (e) => {
+        copyCustomer(customer, e.currentTarget);
+      });
+
+      return card;
     }
 
-    function saveCustomersToLocalStorage() {
-      const cards = Array.from(document.querySelectorAll('.customer-card'));
+    function rerenderCustomers() {
+      if (!customersList) return;
 
-      const customers = cards.map(card => ({
-        name: card.querySelector('.customer-name-input')?.value || '',
-        address: card.querySelector('.customer-address')?.value || '',
-        email: card.querySelector('.customer-email')?.value || '',
-        phone: card.querySelector('.customer-phone')?.value || ''
-      }));
+      const customers = getStoredCustomers();
+      customersList.innerHTML = '';
 
-      localStorage.setItem('jaynex_customers', JSON.stringify(customers));
-    }
+      customers.forEach((customer, index) => {
+        const card = currentUser?.role === 'admin'
+          ? renderAdminCustomerCard(customer, index)
+          : renderStaffCustomerCard(customer, index);
 
-    function loadCustomersFromLocalStorage() {
-      const saved = localStorage.getItem('jaynex_customers');
-      if (!saved) return;
-
-      try {
-        const customers = JSON.parse(saved);
-        if (!Array.isArray(customers)) return;
-
-        customersList.innerHTML = '';
-        customers.forEach(customer => createCustomerCard(customer));
-      } catch (err) {
-        console.error('CUSTOMER LOAD ERROR:', err);
-      }
+        customersList.appendChild(card);
+      });
     }
 
     addCustomerBtn.addEventListener('click', () => {
-      createCustomerCard();
-      saveCustomersToLocalStorage();
+      const customers = getStoredCustomers();
+      customers.unshift({
+        name: '',
+        address: '',
+        email: '',
+        phone: '',
+        saved: false,
+        reviewed: false
+      });
+      saveCustomers(customers);
+      rerenderCustomers();
     });
 
     const savedUser = getSession();
@@ -1206,8 +1466,6 @@
     } else {
       showLogin();
     }
-
-    loadCustomersFromLocalStorage();
   </script>
 </body>
 </html>
