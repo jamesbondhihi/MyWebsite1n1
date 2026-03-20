@@ -3,160 +3,390 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dark Admin Dashboard</title>
+  <title>JAYNEX Dashboard</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { background: #070b16; color: #e8eefc; padding: 24px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .title { font-size: 32px; font-weight: 700; margin-bottom: 8px; color: #edf3ff; }
-    .subtitle { color: #8ea0c9; margin-bottom: 28px; font-size: 14px; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
-    .stat-card { background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%); border: 1px solid #1a2744; border-radius: 18px; padding: 20px; }
-    .stat-label { color: #8ea0c9; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
-    .stat-value { font-size: 34px; font-weight: 700; margin-bottom: 6px; color: #edf3ff; }
-    .stat-change { color: #35d07f; font-size: 13px; }
-    .section-title { font-size: 22px; font-weight: 700; margin: 26px 0 16px; color: #edf3ff; }
-    .visitors { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
-    .visitor-card { background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%); border: 1px solid #1a2744; border-radius: 18px; padding: 18px; transition: border-color 0.3s; }
-    .visitor-card.approved { border-color: #1a5c38; background: linear-gradient(180deg, #0a1e14 0%, #071510 100%); }
-    .visitor-card.denied { border-color: #5c1a1a; background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%); }
-    .badge { display: inline-block; background: #182441; color: #9cb3e7; border: 1px solid #26395f; padding: 5px 10px; border-radius: 999px; font-size: 12px; margin-bottom: 14px; }
-    .row { margin-bottom: 11px; }
-    .label { color: #7f92bc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
-    .value { font-size: 15px; font-weight: 600; color: #edf3ff; }
-    .divider { height: 1px; background: #1a2744; margin: 16px 0; }
-    .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #7f92bc; margin-bottom: 12px; }
-    .verdict-row { display: flex; gap: 10px; margin-bottom: 10px; }
-    .btn { flex: 1; border: none; border-radius: 12px; padding: 11px 14px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s ease; }
-    .btn-approve { background: #15532e; color: #6ee7a0; border: 1px solid #1e7a41; }
-    .btn-approve:hover { background: #1a6b39; }
-    .btn-deny { background: #4a1515; color: #f87171; border: 1px solid #7a1e1e; }
-    .btn-deny:hover { background: #5c1a1a; }
-    .btn-detail { background: #131c31; color: #d5def3; border: 1px solid #26395f; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
-    .btn-detail:hover { background: #182441; }
-    .btn-block { background: #1a1010; color: #f87171; border: 1px solid #4a1515; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
-    .btn-block:hover { background: #291515; }
-    .status-banner { display: none; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 10px; }
-    .status-banner.show { display: flex; }
-    .status-banner.approved { background: #0e3d22; color: #6ee7a0; border: 1px solid #1e7a41; }
-    .status-banner.denied { background: #3d0e0e; color: #f87171; border: 1px solid #7a1e1e; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-approve { background: #22c55e; }
-    .dot-deny { background: #ef4444; }
-    .risk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .risk-label { font-size: 11px; color: #7f92bc; text-transform: uppercase; letter-spacing: 0.08em; width: 60px; flex-shrink: 0; }
-    .risk-bar-bg { flex: 1; height: 5px; background: #1a2744; border-radius: 99px; overflow: hidden; }
-    .risk-bar { height: 100%; border-radius: 99px; }
-    .risk-val { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
-    .chart-box { margin-top: 24px; padding: 20px; height: 140px; border-radius: 18px; border: 1px solid #1a2744; background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%); position: relative; overflow: hidden; margin-bottom: 28px; }
-    .chart-line { position: absolute; left: 20px; right: 20px; bottom: 20px; height: 70px; }
-    .chart-line svg { width: 100%; height: 100%; }
-    .footer-note { color: #6f83ad; margin-top: 18px; font-size: 12px; }
-    html, body {
-  min-height: 100%;
-}
 
-body {
-  padding: 0;
-  background:
-    radial-gradient(circle at 75% 35%, rgba(42, 95, 255, 0.18), transparent 22%),
-    radial-gradient(circle at 90% 95%, rgba(121, 66, 255, 0.18), transparent 18%),
-    #070b16;
-}
+    html, body { min-height: 100%; }
 
-.app-shell {
-  display: flex;
-  min-height: 100vh;
-}
+    body {
+      color: #e8eefc;
+      background:
+        radial-gradient(circle at 75% 35%, rgba(42, 95, 255, 0.18), transparent 22%),
+        radial-gradient(circle at 90% 95%, rgba(121, 66, 255, 0.18), transparent 18%),
+        #070b16;
+    }
 
-.sidebar {
-  width: 250px;
-  background: linear-gradient(180deg, #0b1020 0%, #080d19 100%);
-  border-right: 1px solid #16213b;
-  padding: 26px 18px;
-  flex-shrink: 0;
-}
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
 
-.brand {
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: #eef4ff;
-  margin-bottom: 2px;
-}
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(180deg, #0b1020 0%, #080d19 100%);
+      border-right: 1px solid #16213b;
+      padding: 26px 18px;
+      flex-shrink: 0;
+    }
 
-.brand-sub {
-  color: #7f92bc;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  margin-bottom: 26px;
-}
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #eef4ff;
+      margin-bottom: 2px;
+    }
 
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+    .brand-sub {
+      color: #7f92bc;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      margin-bottom: 26px;
+    }
 
-.nav-section {
-  color: #5f739f;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  margin-top: 16px;
-  margin-bottom: 6px;
-  padding: 0 10px;
-}
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
 
-.nav-item {
-  display: block;
-  text-decoration: none;
-  color: #b8c7ea;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
+    .nav-section {
+      color: #5f739f;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      padding: 0 10px;
+    }
 
-.nav-item:hover {
-  background: #10192d;
-  color: #eef4ff;
-}
+    .nav-item {
+      display: block;
+      text-decoration: none;
+      color: #b8c7ea;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
 
-.nav-item.active {
-  background: linear-gradient(180deg, #182449 0%, #121c38 100%);
-  border: 1px solid #24365d;
-  color: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-}
+    .nav-item:hover {
+      background: #10192d;
+      color: #eef4ff;
+    }
 
-.main-content {
-  flex: 1;
-  min-width: 0;
-  padding: 24px 28px;
-}
+    .nav-item.active {
+      background: linear-gradient(180deg, #182449 0%, #121c38 100%);
+      border: 1px solid #24365d;
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
 
-.container {
-  max-width: none;
-  margin: 0;
-}
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      padding: 24px 28px;
+    }
 
-@media (max-width: 900px) {
-  .app-shell {
-    flex-direction: column;
-  }
+    .container {
+      max-width: none;
+      margin: 0;
+    }
 
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #16213b;
-  }
+    .page {
+      display: none;
+    }
 
-  .main-content {
-    padding: 18px;
-  }
-}
+    .page.active {
+      display: block;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #edf3ff;
+    }
+
+    .subtitle {
+      color: #8ea0c9;
+      margin-bottom: 28px;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card,
+    .visitor-card,
+    .chart-box,
+    .message-list-card {
+      background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
+      border: 1px solid #1a2744;
+      border-radius: 18px;
+    }
+
+    .stat-card {
+      padding: 20px;
+    }
+
+    .stat-label {
+      color: #8ea0c9;
+      font-size: 12px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+      font-size: 34px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #edf3ff;
+    }
+
+    .stat-change {
+      color: #35d07f;
+      font-size: 13px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 26px 0 16px;
+      color: #edf3ff;
+    }
+
+    .visitors {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    .visitor-card {
+      padding: 18px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #182441;
+      color: #9cb3e7;
+      border: 1px solid #26395f;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      margin-bottom: 11px;
+    }
+
+    .label {
+      color: #7f92bc;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+
+    .value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #edf3ff;
+      word-break: break-word;
+    }
+
+    .divider {
+      height: 1px;
+      background: #1a2744;
+      margin: 16px 0;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7f92bc;
+      margin-bottom: 12px;
+    }
+
+    .verdict-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-detail {
+      background: #131c31;
+      color: #d5def3;
+      border: 1px solid #26395f;
+      font-size: 12px;
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .btn-detail:hover {
+      background: #182441;
+    }
+
+    .risk-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .risk-label {
+      font-size: 11px;
+      color: #7f92bc;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .risk-bar-bg {
+      flex: 1;
+      height: 5px;
+      background: #1a2744;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .risk-bar {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    .risk-val {
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    .chart-box {
+      margin-top: 24px;
+      padding: 20px;
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .chart-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      height: 70px;
+    }
+
+    .chart-line svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .footer-note {
+      color: #6f83ad;
+      margin-top: 18px;
+      font-size: 12px;
+    }
+
+    .message-list-card {
+      padding: 18px;
+    }
+
+    .message-item {
+      padding: 16px 0;
+      border-bottom: 1px solid #1a2744;
+    }
+
+    .message-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .message-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .message-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #edf3ff;
+    }
+
+    .message-time {
+      color: #8ea0c9;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .message-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 18px;
+    }
+
+    .message-field {
+      min-width: 0;
+    }
+
+    .loading,
+    .empty-state,
+    .error-state {
+      padding: 20px;
+      color: #b8c7ea;
+      font-size: 14px;
+    }
+
+    .error-state {
+      color: #fda4af;
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #16213b;
+      }
+
+      .main-content {
+        padding: 18px;
+      }
+
+      .message-top {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -167,117 +397,289 @@ body {
 
       <nav class="nav">
         <div class="nav-section">Main</div>
-        <a href="#" class="nav-item active">Dashboard</a>
-        <a href="#" class="nav-item">Customers</a>
-        <a href="#" class="nav-item">Messages</a>
+        <a class="nav-item active" data-page="dashboard">Dashboard</a>
+        <a class="nav-item" data-page="customers">Customers</a>
+        <a class="nav-item" data-page="messages">Messages</a>
 
         <div class="nav-section">Management</div>
-        <a href="#" class="nav-item">Reports</a>
-        <a href="#" class="nav-item">Sessions</a>
-        <a href="#" class="nav-item">Domains</a>
-        <a href="#" class="nav-item">Integrations</a>
+        <a class="nav-item" data-page="reports">Reports</a>
+        <a class="nav-item" data-page="sessions">Sessions</a>
+        <a class="nav-item" data-page="domains">Domains</a>
+        <a class="nav-item" data-page="integrations">Integrations</a>
 
         <div class="nav-section">System</div>
-        <a href="#" class="nav-item">Settings</a>
-        <a href="#" class="nav-item">Billing</a>
-        <a href="#" class="nav-item">Logs</a>
-        <a href="#" class="nav-item">Support</a>
+        <a class="nav-item" data-page="settings">Settings</a>
+        <a class="nav-item" data-page="billing">Billing</a>
+        <a class="nav-item" data-page="logs">Logs</a>
+        <a class="nav-item" data-page="support">Support</a>
       </nav>
     </aside>
 
     <main class="main-content">
       <div class="container">
-        <div class="title">Overview</div>
-        <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
+        <section id="page-dashboard" class="page active">
+          <div class="title">Overview</div>
+          <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
 
-        <div class="stats">
-          <div class="stat-card">
-            <div class="stat-label">Total Requests</div>
-            <div class="stat-value">349</div>
-            <div class="stat-change">+18% this week</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Today</div>
-            <div class="stat-value">117</div>
-            <div class="stat-change">+25.7% in last 24h</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Active Sessions</div>
-            <div class="stat-value">12</div>
-            <div class="stat-change">Live right now</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Open Tickets</div>
-            <div class="stat-value">7</div>
-            <div class="stat-change" style="color:#f59e0b;">Needs review</div>
-          </div>
-        </div>
-
-        <div class="chart-box">
-          <div class="stat-label">Traffic Trend</div>
-          <div class="chart-line">
-            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-              <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
-                points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="section-title">Recent Activity</div>
-
-        <div class="visitors">
-          <div class="visitor-card">
-            <div class="badge">Just now</div>
-            <div class="row"><div class="label">Project</div><div class="value">example.org</div></div>
-            <div class="row"><div class="label">Region</div><div class="value">Shanghai, China</div></div>
-            <div class="row"><div class="label">Browser</div><div class="value">Edge on Windows</div></div>
-            <div class="row"><div class="label">Current Page</div><div class="value">/pricing</div></div>
-            <div class="divider"></div>
-            <div class="panel-title">Health Signals</div>
-            <div class="risk-row">
-              <span class="risk-label">Load</span>
-              <div class="risk-bar-bg"><div class="risk-bar" style="width:72%; background:#60a5fa;"></div></div>
-              <span class="risk-val" style="color:#93c5fd;">72%</span>
+          <div class="stats">
+            <div class="stat-card">
+              <div class="stat-label">Total Requests</div>
+              <div class="stat-value">349</div>
+              <div class="stat-change">+18% this week</div>
             </div>
-            <div class="risk-row">
-              <span class="risk-label">Errors</span>
-              <div class="risk-bar-bg"><div class="risk-bar" style="width:18%; background:#f59e0b;"></div></div>
-              <span class="risk-val" style="color:#fbbf24;">18%</span>
+            <div class="stat-card">
+              <div class="stat-label">Today</div>
+              <div class="stat-value">117</div>
+              <div class="stat-change">+25.7% in last 24h</div>
             </div>
-            <div class="verdict-row">
-              <button class="btn btn-detail">View details</button>
-              <button class="btn btn-detail">Archive</button>
+            <div class="stat-card">
+              <div class="stat-label">Active Sessions</div>
+              <div class="stat-value">12</div>
+              <div class="stat-change">Live right now</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Messages</div>
+              <div class="stat-value" id="messages-count">0</div>
+              <div class="stat-change">Loaded from database</div>
             </div>
           </div>
 
-          <div class="visitor-card">
-            <div class="badge">2 minutes ago</div>
-            <div class="row"><div class="label">Project</div><div class="value">mysite.app</div></div>
-            <div class="row"><div class="label">Region</div><div class="value">Berlin, Germany</div></div>
-            <div class="row"><div class="label">Browser</div><div class="value">Chrome on macOS</div></div>
-            <div class="row"><div class="label">Current Page</div><div class="value">/contact</div></div>
-            <div class="divider"></div>
-            <div class="panel-title">Health Signals</div>
-            <div class="risk-row">
-              <span class="risk-label">Load</span>
-              <div class="risk-bar-bg"><div class="risk-bar" style="width:24%; background:#22c55e;"></div></div>
-              <span class="risk-val" style="color:#6ee7a0;">24%</span>
-            </div>
-            <div class="risk-row">
-              <span class="risk-label">Errors</span>
-              <div class="risk-bar-bg"><div class="risk-bar" style="width:5%; background:#22c55e;"></div></div>
-              <span class="risk-val" style="color:#6ee7a0;">5%</span>
-            </div>
-            <div class="verdict-row">
-              <button class="btn btn-detail">View details</button>
-              <button class="btn btn-detail">Archive</button>
+          <div class="chart-box">
+            <div class="stat-label">Traffic Trend</div>
+            <div class="chart-line">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
+                  points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
+              </svg>
             </div>
           </div>
-        </div>
 
-        <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
+          <div class="section-title">Recent Activity</div>
+
+          <div class="visitors">
+            <div class="visitor-card">
+              <div class="badge">Just now</div>
+              <div class="row"><div class="label">Project</div><div class="value">example.org</div></div>
+              <div class="row"><div class="label">Region</div><div class="value">Shanghai, China</div></div>
+              <div class="row"><div class="label">Browser</div><div class="value">Edge on Windows</div></div>
+              <div class="row"><div class="label">Current Page</div><div class="value">/pricing</div></div>
+              <div class="divider"></div>
+              <div class="panel-title">Health Signals</div>
+              <div class="risk-row">
+                <span class="risk-label">Load</span>
+                <div class="risk-bar-bg"><div class="risk-bar" style="width:72%; background:#60a5fa;"></div></div>
+                <span class="risk-val" style="color:#93c5fd;">72%</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-label">Errors</span>
+                <div class="risk-bar-bg"><div class="risk-bar" style="width:18%; background:#f59e0b;"></div></div>
+                <span class="risk-val" style="color:#fbbf24;">18%</span>
+              </div>
+              <div class="verdict-row">
+                <button class="btn btn-detail">View details</button>
+                <button class="btn btn-detail">Archive</button>
+              </div>
+            </div>
+
+            <div class="visitor-card">
+              <div class="badge">2 minutes ago</div>
+              <div class="row"><div class="label">Project</div><div class="value">mysite.app</div></div>
+              <div class="row"><div class="label">Region</div><div class="value">Berlin, Germany</div></div>
+              <div class="row"><div class="label">Browser</div><div class="value">Chrome on macOS</div></div>
+              <div class="row"><div class="label">Current Page</div><div class="value">/contact</div></div>
+              <div class="divider"></div>
+              <div class="panel-title">Health Signals</div>
+              <div class="risk-row">
+                <span class="risk-label">Load</span>
+                <div class="risk-bar-bg"><div class="risk-bar" style="width:24%; background:#22c55e;"></div></div>
+                <span class="risk-val" style="color:#6ee7a0;">24%</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-label">Errors</span>
+                <div class="risk-bar-bg"><div class="risk-bar" style="width:5%; background:#22c55e;"></div></div>
+                <span class="risk-val" style="color:#6ee7a0;">5%</span>
+              </div>
+              <div class="verdict-row">
+                <button class="btn btn-detail">View details</button>
+                <button class="btn btn-detail">Archive</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-messages" class="page">
+          <div class="title">Messages</div>
+          <div class="subtitle">Ordered list loaded from your database.</div>
+
+          <div class="message-list-card">
+            <div id="messages-list" class="loading">Loading messages...</div>
+          </div>
+        </section>
+
+        <section id="page-customers" class="page">
+          <div class="title">Customers</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-reports" class="page">
+          <div class="title">Reports</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-sessions" class="page">
+          <div class="title">Sessions</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-domains" class="page">
+          <div class="title">Domains</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-integrations" class="page">
+          <div class="title">Integrations</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-settings" class="page">
+          <div class="title">Settings</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-billing" class="page">
+          <div class="title">Billing</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-logs" class="page">
+          <div class="title">Logs</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <section id="page-support" class="page">
+          <div class="title">Support</div>
+          <div class="subtitle">This page is currently empty.</div>
+        </section>
+
+        <div class="footer-note">Dashboard connected to /api/orders.</div>
       </div>
     </main>
   </div>
+
+  <script>
+    const API_URL = 'https://order-backend-one.vercel.app/api/orders';
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        if (!page) return;
+
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+
+        pages.forEach(section => section.classList.remove('active'));
+        const target = document.getElementById('page-' + page);
+        if (target) target.classList.add('active');
+
+        if (page === 'messages') {
+          loadMessages();
+        }
+      });
+    });
+
+    async function loadMessages() {
+      const list = document.getElementById('messages-list');
+
+      try {
+        list.className = 'loading';
+        list.textContent = 'Loading messages...';
+
+        const res = await fetch(API_URL);
+        if (!res.ok) {
+          throw new Error('API error: ' + res.status);
+        }
+
+        const orders = await res.json();
+
+        document.getElementById('messages-count').textContent = Array.isArray(orders) ? orders.length : 0;
+
+        if (!Array.isArray(orders) || orders.length === 0) {
+          list.className = 'empty-state';
+          list.textContent = 'No messages found.';
+          return;
+        }
+
+        list.className = '';
+        list.innerHTML = orders.map(order => `
+          <div class="message-item">
+            <div class="message-top">
+              <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
+              <div class="message-time">${formatDate(order.created_at)}</div>
+            </div>
+
+            <div class="message-grid">
+              <div class="message-field">
+                <div class="label">Email</div>
+                <div class="value">${escapeHtml(order.email || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Phone</div>
+                <div class="value">${escapeHtml(order.phone || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Address</div>
+                <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Product</div>
+                <div class="value">${escapeHtml(order.product_name || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Quantity</div>
+                <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Price</div>
+                <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Order ID</div>
+                <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+        list.className = 'error-state';
+        list.textContent = 'Error loading messages.';
+      }
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'Unknown date';
+      return new Date(dateString).toLocaleString();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    loadMessages();
+  </script>
 </body>
 </html>
