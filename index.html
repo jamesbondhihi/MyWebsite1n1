@@ -1041,7 +1041,7 @@
       }
 
       if (pageName === 'customers') {
-        rerenderCustomers();
+        loadCustomers();
       }
     }
 
@@ -1071,31 +1071,31 @@
         };
 
         saveSession(currentUser);
-        startUserSession();
+        await startUserSession();
       } catch (err) {
         console.error(err);
         loginError.textContent = 'Server error';
       }
     }
 
-    function startUserSession() {
-      if (!currentUser) return;
+   async function startUserSession() {
+  if (!currentUser) return;
 
-      currentUsernameEl.textContent = currentUser.username;
-      currentRoleEl.textContent = currentUser.role === 'admin' ? 'ADMIN' : 'STAFF';
+  currentUsernameEl.textContent = currentUser.username;
+  currentRoleEl.textContent = currentUser.role === 'admin' ? 'ADMIN' : 'STAFF';
 
-      applyRolePermissions(currentUser.role);
-      showApp();
+  applyRolePermissions(currentUser.role);
+  showApp();
 
-      if (currentUser.role === 'staff') {
-        addCustomerBtn.classList.add('hidden');
-      } else {
-        addCustomerBtn.classList.remove('hidden');
-      }
+  if (currentUser.role === 'staff') {
+    addCustomerBtn.classList.add('hidden');
+  } else {
+    addCustomerBtn.classList.remove('hidden');
+  }
 
-      rerenderCustomers();
-      activatePage('dashboard');
-    }
+  await loadCustomers();
+  activatePage('dashboard');
+}
 
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1538,11 +1538,11 @@ function rerenderCustomers() {
 
     const savedUser = getSession();
     if (savedUser && savedUser.username && savedUser.role) {
-      currentUser = savedUser;
-      startUserSession();
+    currentUser = savedUser;
+    startUserSession().catch(console.error);
     } else {
-      showLogin();
-    }
+    showLogin();
+  }
   </script>
 </body>
 </html>
