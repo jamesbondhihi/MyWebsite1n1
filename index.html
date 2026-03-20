@@ -1,189 +1,57 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dark Admin Dashboard</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      background: #070b16;
-      color: #e8eefc;
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .title {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: #8ea0c9;
-      margin-bottom: 28px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-      margin-bottom: 28px;
-    }
-
-    .stat-card,
-    .visitor-card {
-      background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
-      border: 1px solid #1a2744;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    }
-
-    .stat-card {
-      padding: 20px;
-    }
-
-    .stat-label {
-      color: #8ea0c9;
-      font-size: 13px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .stat-value {
-      font-size: 34px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .stat-change {
-      color: #35d07f;
-      font-size: 14px;
-    }
-
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 26px 0 16px;
-    }
-
-    .visitors {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 18px;
-    }
-
-    .visitor-card {
-      padding: 18px;
-    }
-
-    .badge {
-      display: inline-block;
-      background: #182441;
-      color: #9cb3e7;
-      border: 1px solid #26395f;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-
-    .row {
-      margin-bottom: 12px;
-    }
-
-    .label {
-      color: #7f92bc;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 4px;
-    }
-
-    .value {
-      font-size: 16px;
-      font-weight: 600;
-      color: #edf3ff;
-      word-break: break-word;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .btn {
-      flex: 1;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .btn-primary {
-      background: #2563eb;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #1d4ed8;
-    }
-
-    .btn-secondary {
-      background: #131c31;
-      color: #d5def3;
-      border: 1px solid #26395f;
-    }
-
-    .btn-secondary:hover {
-      background: #182441;
-    }
-
-    .chart-box {
-      margin-top: 24px;
-      padding: 20px;
-      height: 180px;
-      border-radius: 18px;
-      border: 1px solid #1a2744;
-      background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .chart-line {
-      position: absolute;
-      left: 20px;
-      right: 20px;
-      bottom: 30px;
-      height: 80px;
-      border-bottom: 1px solid #1d2b49;
-    }
-
-    .chart-line svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    .footer-note {
-      color: #6f83ad;
-      margin-top: 18px;
-      font-size: 13px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: #070b16; color: #e8eefc; padding: 24px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .title { font-size: 32px; font-weight: 700; margin-bottom: 8px; color: #edf3ff; }
+    .subtitle { color: #8ea0c9; margin-bottom: 28px; font-size: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
+    .stat-card { background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%); border: 1px solid #1a2744; border-radius: 18px; padding: 20px; }
+    .stat-label { color: #8ea0c9; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .stat-value { font-size: 34px; font-weight: 700; margin-bottom: 6px; color: #edf3ff; }
+    .stat-change { color: #35d07f; font-size: 13px; }
+    .section-title { font-size: 22px; font-weight: 700; margin: 26px 0 16px; color: #edf3ff; }
+    .visitors { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    .visitor-card { background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%); border: 1px solid #1a2744; border-radius: 18px; padding: 18px; transition: border-color 0.3s; }
+    .visitor-card.approved { border-color: #1a5c38; background: linear-gradient(180deg, #0a1e14 0%, #071510 100%); }
+    .visitor-card.denied { border-color: #5c1a1a; background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%); }
+    .badge { display: inline-block; background: #182441; color: #9cb3e7; border: 1px solid #26395f; padding: 5px 10px; border-radius: 999px; font-size: 12px; margin-bottom: 14px; }
+    .row { margin-bottom: 11px; }
+    .label { color: #7f92bc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+    .value { font-size: 15px; font-weight: 600; color: #edf3ff; }
+    .divider { height: 1px; background: #1a2744; margin: 16px 0; }
+    .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #7f92bc; margin-bottom: 12px; }
+    .verdict-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .btn { flex: 1; border: none; border-radius: 12px; padding: 11px 14px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s ease; }
+    .btn-approve { background: #15532e; color: #6ee7a0; border: 1px solid #1e7a41; }
+    .btn-approve:hover { background: #1a6b39; }
+    .btn-deny { background: #4a1515; color: #f87171; border: 1px solid #7a1e1e; }
+    .btn-deny:hover { background: #5c1a1a; }
+    .btn-detail { background: #131c31; color: #d5def3; border: 1px solid #26395f; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
+    .btn-detail:hover { background: #182441; }
+    .btn-block { background: #1a1010; color: #f87171; border: 1px solid #4a1515; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
+    .btn-block:hover { background: #291515; }
+    .status-banner { display: none; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 10px; }
+    .status-banner.show { display: flex; }
+    .status-banner.approved { background: #0e3d22; color: #6ee7a0; border: 1px solid #1e7a41; }
+    .status-banner.denied { background: #3d0e0e; color: #f87171; border: 1px solid #7a1e1e; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-approve { background: #22c55e; }
+    .dot-deny { background: #ef4444; }
+    .risk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .risk-label { font-size: 11px; color: #7f92bc; text-transform: uppercase; letter-spacing: 0.08em; width: 60px; flex-shrink: 0; }
+    .risk-bar-bg { flex: 1; height: 5px; background: #1a2744; border-radius: 99px; overflow: hidden; }
+    .risk-bar { height: 100%; border-radius: 99px; }
+    .risk-val { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
+    .chart-box { margin-top: 24px; padding: 20px; height: 140px; border-radius: 18px; border: 1px solid #1a2744; background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%); position: relative; overflow: hidden; margin-bottom: 28px; }
+    .chart-line { position: absolute; left: 20px; right: 20px; bottom: 20px; height: 70px; }
+    .chart-line svg { width: 100%; height: 100%; }
+    .footer-note { color: #6f83ad; margin-top: 18px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -197,17 +65,20 @@
         <div class="stat-value">349</div>
         <div class="stat-change">+18% this week</div>
       </div>
-
       <div class="stat-card">
         <div class="stat-label">Today</div>
         <div class="stat-value">117</div>
         <div class="stat-change">+25.7% in last 24h</div>
       </div>
-
       <div class="stat-card">
         <div class="stat-label">Active Sessions</div>
         <div class="stat-value">12</div>
         <div class="stat-change">Live right now</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Review</div>
+        <div class="stat-value" id="pending-count">2</div>
+        <div class="stat-change" style="color:#f59e0b;">Awaiting decision</div>
       </div>
     </div>
 
@@ -215,12 +86,8 @@
       <div class="stat-label">Traffic Trend</div>
       <div class="chart-line">
         <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-          <polyline
-            fill="none"
-            stroke="#46c2ff"
-            stroke-width="1.5"
-            points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"
-          />
+          <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
+            points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
         </svg>
       </div>
     </div>
@@ -228,78 +95,142 @@
     <div class="section-title">Recent Visitors</div>
 
     <div class="visitors">
-      <div class="visitor-card">
+
+      <!-- Visitor 1 -->
+      <div class="visitor-card" id="card-1">
         <div class="badge">Just now</div>
+        <div class="row"><div class="label">Domain</div><div class="value">example.org</div></div>
+        <div class="row"><div class="label">Location</div><div class="value">Shanghai, China</div></div>
+        <div class="row"><div class="label">IP Address</div><div class="value">180.153.236.120</div></div>
+        <div class="row"><div class="label">Browser</div><div class="value">Edge on Windows</div></div>
+        <div class="row"><div class="label">Current Page</div><div class="value">/pricing</div></div>
 
-        <div class="row">
-          <div class="label">Domain</div>
-          <div class="value">example.org</div>
+        <div class="divider"></div>
+        <div class="panel-title">Risk Signals</div>
+        <div class="risk-row">
+          <span class="risk-label">Threat</span>
+          <div class="risk-bar-bg"><div class="risk-bar" style="width:72%; background:#ef4444;"></div></div>
+          <span class="risk-val" style="color:#f87171;">72%</span>
+        </div>
+        <div class="risk-row">
+          <span class="risk-label">Bot score</span>
+          <div class="risk-bar-bg"><div class="risk-bar" style="width:58%; background:#f59e0b;"></div></div>
+          <span class="risk-val" style="color:#fbbf24;">58%</span>
+        </div>
+        <div class="risk-row">
+          <span class="risk-label">VPN</span>
+          <div class="risk-bar-bg"><div class="risk-bar" style="width:90%; background:#ef4444;"></div></div>
+          <span class="risk-val" style="color:#f87171;">90%</span>
         </div>
 
-        <div class="row">
-          <div class="label">Location</div>
-          <div class="value">Shanghai, China</div>
+        <div class="divider"></div>
+        <div class="panel-title">Access Decision</div>
+        <div class="verdict-row">
+          <button class="btn btn-approve" onclick="decide(1,'approved')">Approve</button>
+          <button class="btn btn-deny" onclick="decide(1,'denied')">Deny</button>
         </div>
-
-        <div class="row">
-          <div class="label">IP Address</div>
-          <div class="value">180.153.236.120</div>
+        <div class="verdict-row">
+          <button class="btn btn-detail" onclick="decide(1,'detail')">View details</button>
+          <button class="btn btn-block" onclick="decide(1,'block')">Block IP</button>
         </div>
-
-        <div class="row">
-          <div class="label">Browser</div>
-          <div class="value">Edge on Windows</div>
-        </div>
-
-        <div class="row">
-          <div class="label">Current Page</div>
-          <div class="value">/pricing</div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btn-primary">View Details</button>
-          <button class="btn btn-secondary">Archive</button>
+        <div class="status-banner" id="banner-1">
+          <div class="dot" id="dot-1"></div>
+          <span id="banner-text-1"></span>
         </div>
       </div>
 
-      <div class="visitor-card">
+      <!-- Visitor 2 -->
+      <div class="visitor-card" id="card-2">
         <div class="badge">2 minutes ago</div>
+        <div class="row"><div class="label">Domain</div><div class="value">mysite.app</div></div>
+        <div class="row"><div class="label">Location</div><div class="value">Berlin, Germany</div></div>
+        <div class="row"><div class="label">IP Address</div><div class="value">91.12.100.45</div></div>
+        <div class="row"><div class="label">Browser</div><div class="value">Chrome on macOS</div></div>
+        <div class="row"><div class="label">Current Page</div><div class="value">/contact</div></div>
 
-        <div class="row">
-          <div class="label">Domain</div>
-          <div class="value">mysite.app</div>
+        <div class="divider"></div>
+        <div class="panel-title">Risk Signals</div>
+        <div class="risk-row">
+          <span class="risk-label">Threat</span>
+          <div class="risk-bar-bg"><div class="risk-bar" style="width:8%; background:#22c55e;"></div></div>
+          <span class="risk-val" style="color:#6ee7a0;">8%</span>
+        </div>
+        <div class="risk-row">
+          <span class="risk-label">Bot score</span>
+          <div class="risk-bar-bg"><div class="risk-bar" style="width:12%; background:#22c55e;"></div></div>
+          <span class="risk-val" style="color:#6ee7a0;">12%</span>
+        </div>
+        <div class="risk-row">
+          <span class="risk-label">VPN</span>
+          <div class="risk-bar-bg"><div class="risk-bar" style="width:5%; background:#22c55e;"></div></div>
+          <span class="risk-val" style="color:#6ee7a0;">5%</span>
         </div>
 
-        <div class="row">
-          <div class="label">Location</div>
-          <div class="value">Berlin, Germany</div>
+        <div class="divider"></div>
+        <div class="panel-title">Access Decision</div>
+        <div class="verdict-row">
+          <button class="btn btn-approve" onclick="decide(2,'approved')">Approve</button>
+          <button class="btn btn-deny" onclick="decide(2,'denied')">Deny</button>
         </div>
-
-        <div class="row">
-          <div class="label">IP Address</div>
-          <div class="value">91.12.100.45</div>
+        <div class="verdict-row">
+          <button class="btn btn-detail" onclick="decide(2,'detail')">View details</button>
+          <button class="btn btn-block" onclick="decide(2,'block')">Block IP</button>
         </div>
-
-        <div class="row">
-          <div class="label">Browser</div>
-          <div class="value">Chrome on macOS</div>
-        </div>
-
-        <div class="row">
-          <div class="label">Current Page</div>
-          <div class="value">/contact</div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btn-primary">View Details</button>
-          <button class="btn btn-secondary">Archive</button>
+        <div class="status-banner" id="banner-2">
+          <div class="dot" id="dot-2"></div>
+          <span id="banner-text-2"></span>
         </div>
       </div>
+
     </div>
 
-    <div class="footer-note">
-      Demo layout only — connect it to your own backend or analytics source.
-    </div>
+    <div class="footer-note">Demo layout only — connect it to your own backend or analytics source.</div>
   </div>
+
+  <script>
+    let pending = 2;
+    const decided = new Set();
+
+    function decide(id, action) {
+      const card = document.getElementById('card-' + id);
+      const banner = document.getElementById('banner-' + id);
+      const dot = document.getElementById('dot-' + id);
+      const text = document.getElementById('banner-text-' + id);
+
+      banner.className = 'status-banner show';
+
+      if (action === 'approved') {
+        card.className = 'visitor-card approved';
+        dot.className = 'dot dot-approve';
+        text.textContent = 'Access approved — session allowed';
+        banner.className = 'status-banner show approved';
+        updatePending(id);
+      } else if (action === 'denied') {
+        card.className = 'visitor-card denied';
+        dot.className = 'dot dot-deny';
+        text.textContent = 'Access denied — session blocked';
+        banner.className = 'status-banner show denied';
+        updatePending(id);
+      } else if (action === 'block') {
+        card.className = 'visitor-card denied';
+        dot.className = 'dot dot-deny';
+        text.textContent = 'IP address added to blocklist';
+        banner.className = 'status-banner show denied';
+        updatePending(id);
+      } else if (action === 'detail') {
+        banner.className = 'status-banner show approved';
+        dot.className = 'dot dot-approve';
+        text.textContent = 'Full session log opened in new tab';
+      }
+    }
+
+    function updatePending(id) {
+      if (!decided.has(id)) {
+        decided.add(id);
+        pending = Math.max(0, pending - 1);
+        document.getElementById('pending-count').textContent = pending;
+      }
+    }
+  </script>
 </body>
 </html>
