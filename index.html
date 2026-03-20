@@ -845,6 +845,7 @@
 
   <script>
     const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
+    const ORDERS_API = 'https://order-backend-one.vercel.app/api/orders';
 
     const loginScreen = document.getElementById('login-screen');
     const appShell = document.getElementById('app-shell');
@@ -910,6 +911,10 @@
 
       targetNav.classList.add('active');
       targetPage.classList.add('active');
+
+      if (pageName === 'messages' && currentUser?.role === 'admin') {
+  loadMessages();
+}
     }
 
     async function login(username, password) {
@@ -987,6 +992,104 @@
     } else {
       showLogin();
     }
+    async function loadMessages() {
+  const list = document.getElementById('messages-list');
+  if (!list) return;
+
+  try {
+    list.className = 'loading';
+    list.textContent = 'Loading messages...';
+
+    const res = await fetch(ORDERS_API);
+    if (!res.ok) {
+      throw new Error('API error: ' + res.status);
+    }
+
+    let orders = await res.json();
+
+    if (!Array.isArray(orders)) {
+      orders = [];
+    }
+
+    orders.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+      return dateB - dateA;
+    });
+
+    if (orders.length === 0) {
+      list.className = 'empty-state';
+      list.textContent = 'No messages found.';
+      return;
+    }
+
+    list.className = '';
+    list.innerHTML = orders.map(order => `
+      <div class="message-item">
+        <div class="message-top">
+          <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
+          <div class="message-time">${formatDate(order.created_at)}</div>
+        </div>
+
+        <div class="message-grid">
+          <div class="message-field">
+            <div class="label">Email</div>
+            <div class="value">${escapeHtml(order.email || '—')}</div>
+          </div>
+
+          <div class="message-field">
+            <div class="label">Phone</div>
+            <div class="value">${escapeHtml(order.phone || '—')}</div>
+          </div>
+
+          <div class="message-field">
+            <div class="label">Address</div>
+            <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
+          </div>
+
+          <div class="message-field">
+            <div class="label">Product</div>
+            <div class="value">${escapeHtml(order.product_name || '—')}</div>
+          </div>
+
+          <div class="message-field">
+            <div class="label">Quantity</div>
+            <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
+          </div>
+
+          <div class="message-field">
+            <div class="label">Price</div>
+            <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
+          </div>
+
+          <div class="message-field">
+            <div class="label">Order ID</div>
+            <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error(err);
+    list.className = 'error-state';
+    list.textContent = 'Error loading messages.';
+  }
+}
+    function formatDate(dateString) {
+  if (!dateString) return 'Unknown date';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return 'Unknown date';
+  return date.toLocaleString();
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
   </script>
 </body>
 </html>
