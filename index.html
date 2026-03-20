@@ -718,6 +718,7 @@
       display: none;
       font-weight: 700;
       letter-spacing: 0.04em;
+      line-height: 1.5;
     }
 
     .customer-status.show {
@@ -1225,10 +1226,23 @@
         .replaceAll('>', '&gt;');
     }
 
+    function normalizeCustomers(customers) {
+      return customers.map(customer => ({
+        name: customer.name || '',
+        address: customer.address || '',
+        email: customer.email || '',
+        phone: customer.phone || '',
+        saved: !!customer.saved,
+        reviewed: !!customer.reviewed,
+        reviewedBy: customer.reviewedBy || '',
+        reviewedAt: customer.reviewedAt || ''
+      }));
+    }
+
     function getStoredCustomers() {
       try {
         const saved = JSON.parse(localStorage.getItem('jaynex_customers') || '[]');
-        return Array.isArray(saved) ? saved : [];
+        return Array.isArray(saved) ? normalizeCustomers(saved) : [];
       } catch {
         return [];
       }
@@ -1243,7 +1257,10 @@
         `Name: ${customer.name || ''}`,
         `Address: ${customer.address || ''}`,
         `Email: ${customer.email || ''}`,
-        `Phone: ${customer.phone || ''}`
+        `Phone: ${customer.phone || ''}`,
+        `Reviewed: ${customer.reviewed ? 'Yes' : 'No'}`,
+        `Reviewed By: ${customer.reviewedBy || ''}`,
+        `Reviewed At: ${customer.reviewedAt ? formatDate(customer.reviewedAt) : ''}`
       ].join('\n');
     }
 
@@ -1266,7 +1283,16 @@
 
     function renderAdminCustomerCard(customer, index) {
       const card = document.createElement('div');
-      card.className = 'customer-card';
+      card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
+
+      const reviewedInfo = customer.reviewed
+        ? `
+          <div class="customer-status show">
+            Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}
+            ${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}
+          </div>
+        `
+        : '';
 
       if (customer.saved) {
         card.innerHTML = `
@@ -1286,6 +1312,8 @@
             <div class="customer-display-label">Phone</div>
             <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
           </div>
+
+          ${reviewedInfo}
 
           <div class="customer-card-actions">
             <button class="customer-delete-btn" type="button">Delete</button>
@@ -1347,7 +1375,9 @@
           email: emailInput.value,
           phone: phoneInput.value,
           saved: false,
-          reviewed: false
+          reviewed: customers[index]?.reviewed || false,
+          reviewedBy: customers[index]?.reviewedBy || '',
+          reviewedAt: customers[index]?.reviewedAt || ''
         };
         saveCustomers(customers);
       }
@@ -1364,7 +1394,9 @@
           email: emailInput.value.trim(),
           phone: phoneInput.value.trim(),
           saved: true,
-          reviewed: false
+          reviewed: customers[index]?.reviewed || false,
+          reviewedBy: customers[index]?.reviewedBy || '',
+          reviewedAt: customers[index]?.reviewedAt || ''
         };
         saveCustomers(customers);
         rerenderCustomers();
@@ -1409,7 +1441,11 @@
           <button class="customer-copy-btn" type="button">Copy</button>
         </div>
 
-        <div class="customer-status ${customer.reviewed ? 'show' : ''}">Bearbeitet</div>
+        <div class="customer-status ${customer.reviewed ? 'show' : ''}">
+          ${customer.reviewed
+            ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}`
+            : 'Bearbeitet'}
+        </div>
       `;
 
       const reviewBtn = card.querySelector('.customer-review-btn');
@@ -1418,7 +1454,11 @@
       reviewBtn.addEventListener('click', () => {
         const customers = getStoredCustomers();
         if (!customers[index]) return;
+
         customers[index].reviewed = true;
+        customers[index].reviewedBy = currentUser?.username || 'staff';
+        customers[index].reviewedAt = new Date().toISOString();
+
         saveCustomers(customers);
         rerenderCustomers();
       });
@@ -1453,7 +1493,9 @@
         email: '',
         phone: '',
         saved: false,
-        reviewed: false
+        reviewed: false,
+        reviewedBy: '',
+        reviewedAt: ''
       });
       saveCustomers(customers);
       rerenderCustomers();
