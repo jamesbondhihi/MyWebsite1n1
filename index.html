@@ -1,20 +1,27 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JAYNEX Dashboard</title>
+  <title>Dark Admin Dashboard</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
 
     html, body { min-height: 100%; }
 
     body {
+      padding: 0;
       color: #e8eefc;
       background:
         radial-gradient(circle at 75% 35%, rgba(42, 95, 255, 0.18), transparent 22%),
         radial-gradient(circle at 90% 95%, rgba(121, 66, 255, 0.18), transparent 18%),
         #070b16;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     .app-shell {
@@ -71,6 +78,7 @@
       font-weight: 600;
       transition: 0.2s ease;
       cursor: pointer;
+      user-select: none;
     }
 
     .nav-item:hover {
@@ -117,6 +125,71 @@
       font-size: 14px;
     }
 
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
+      border: 1px solid #1a2744;
+      border-radius: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #edf3ff;
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      color: #8ea0c9;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .role-badge {
+      display: inline-block;
+      background: #182441;
+      color: #9cb3e7;
+      border: 1px solid #26395f;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .logout-btn {
+      border: 1px solid #26395f;
+      background: #131c31;
+      color: #d5def3;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: #182441;
+    }
+
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -127,7 +200,7 @@
     .stat-card,
     .visitor-card,
     .chart-box,
-    .message-list-card {
+    .login-card {
       background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
       border: 1px solid #1a2744;
       border-radius: 18px;
@@ -172,6 +245,17 @@
 
     .visitor-card {
       padding: 18px;
+      transition: border-color 0.3s;
+    }
+
+    .visitor-card.approved {
+      border-color: #1a5c38;
+      background: linear-gradient(180deg, #0a1e14 0%, #071510 100%);
+    }
+
+    .visitor-card.denied {
+      border-color: #5c1a1a;
+      background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%);
     }
 
     .badge {
@@ -235,6 +319,26 @@
       transition: 0.2s ease;
     }
 
+    .btn-approve {
+      background: #15532e;
+      color: #6ee7a0;
+      border: 1px solid #1e7a41;
+    }
+
+    .btn-approve:hover {
+      background: #1a6b39;
+    }
+
+    .btn-deny {
+      background: #4a1515;
+      color: #f87171;
+      border: 1px solid #7a1e1e;
+    }
+
+    .btn-deny:hover {
+      background: #5c1a1a;
+    }
+
     .btn-detail {
       background: #131c31;
       color: #d5def3;
@@ -246,6 +350,61 @@
 
     .btn-detail:hover {
       background: #182441;
+    }
+
+    .btn-block {
+      background: #1a1010;
+      color: #f87171;
+      border: 1px solid #4a1515;
+      font-size: 12px;
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .btn-block:hover {
+      background: #291515;
+    }
+
+    .status-banner {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .status-banner.show {
+      display: flex;
+    }
+
+    .status-banner.approved {
+      background: #0e3d22;
+      color: #6ee7a0;
+      border: 1px solid #1e7a41;
+    }
+
+    .status-banner.denied {
+      background: #3d0e0e;
+      color: #f87171;
+      border: 1px solid #7a1e1e;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-approve {
+      background: #22c55e;
+    }
+
+    .dot-deny {
+      background: #ef4444;
     }
 
     .risk-row {
@@ -312,60 +471,95 @@
       font-size: 12px;
     }
 
-    .message-list-card {
-      padding: 18px;
-    }
-
-    .message-item {
-      padding: 16px 0;
-      border-bottom: 1px solid #1a2744;
-    }
-
-    .message-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .message-top {
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(42, 95, 255, 0.20), transparent 24%),
+        radial-gradient(circle at 80% 80%, rgba(121, 66, 255, 0.18), transparent 20%),
+        rgba(4, 8, 18, 0.96);
       display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .message-name {
-      font-size: 17px;
-      font-weight: 700;
-      color: #edf3ff;
-    }
-
-    .message-time {
-      color: #8ea0c9;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .message-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px 18px;
-    }
-
-    .message-field {
-      min-width: 0;
-    }
-
-    .loading,
-    .empty-state,
-    .error-state {
+      align-items: center;
+      justify-content: center;
       padding: 20px;
-      color: #b8c7ea;
+      z-index: 9999;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #edf3ff;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: #8ea0c9;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .login-group {
+      margin-bottom: 16px;
+    }
+
+    .login-label {
+      display: block;
+      font-size: 12px;
+      color: #8ea0c9;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1px solid #26395f;
+      background: #0b1326;
+      color: #edf3ff;
+      outline: none;
       font-size: 14px;
     }
 
-    .error-state {
+    .login-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.14);
+    }
+
+    .login-btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 16px;
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .login-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .login-error {
+      margin-top: 14px;
       color: #fda4af;
+      font-size: 13px;
+      min-height: 18px;
+      text-align: center;
     }
 
     @media (max-width: 900px) {
@@ -383,40 +577,74 @@
         padding: 18px;
       }
 
-      .message-top {
+      .topbar {
         flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-title">JAYNEX Login</div>
+      <div class="login-subtitle">Sign in to access your dashboard</div>
+
+      <form id="login-form">
+        <div class="login-group">
+          <label class="login-label" for="username">Username</label>
+          <input class="login-input" id="username" type="text" placeholder="Enter username" required />
+        </div>
+
+        <div class="login-group">
+          <label class="login-label" for="password">Password</label>
+          <input class="login-input" id="password" type="password" placeholder="Enter password" required />
+        </div>
+
+        <button class="login-btn" type="submit">Login</button>
+        <div id="login-error" class="login-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-shell" class="app-shell hidden">
     <aside class="sidebar">
       <div class="brand">JAYNEX</div>
       <div class="brand-sub">LIVE</div>
 
       <nav class="nav">
         <div class="nav-section">Main</div>
-        <a class="nav-item active" data-page="dashboard">Dashboard</a>
-        <a class="nav-item" data-page="customers">Customers</a>
-        <a class="nav-item" data-page="messages">Messages</a>
+        <a class="nav-item active" data-page="dashboard" data-roles="admin,staff">Dashboard</a>
+        <a class="nav-item" data-page="customers" data-roles="admin,staff">Customers</a>
+        <a class="nav-item" data-page="messages" data-roles="admin">Messages</a>
 
-        <div class="nav-section">Management</div>
-        <a class="nav-item" data-page="reports">Reports</a>
-        <a class="nav-item" data-page="sessions">Sessions</a>
-        <a class="nav-item" data-page="domains">Domains</a>
-        <a class="nav-item" data-page="integrations">Integrations</a>
+        <div class="nav-section" data-roles="admin">Management</div>
+        <a class="nav-item" data-page="reports" data-roles="admin">Reports</a>
+        <a class="nav-item" data-page="sessions" data-roles="admin">Sessions</a>
+        <a class="nav-item" data-page="domains" data-roles="admin">Domains</a>
+        <a class="nav-item" data-page="integrations" data-roles="admin">Integrations</a>
 
-        <div class="nav-section">System</div>
-        <a class="nav-item" data-page="settings">Settings</a>
-        <a class="nav-item" data-page="billing">Billing</a>
-        <a class="nav-item" data-page="logs">Logs</a>
-        <a class="nav-item" data-page="support">Support</a>
+        <div class="nav-section" data-roles="admin">System</div>
+        <a class="nav-item" data-page="settings" data-roles="admin">Settings</a>
+        <a class="nav-item" data-page="billing" data-roles="admin">Billing</a>
+        <a class="nav-item" data-page="logs" data-roles="admin">Logs</a>
+        <a class="nav-item" data-page="support" data-roles="admin">Support</a>
       </nav>
     </aside>
 
     <main class="main-content">
       <div class="container">
+        <div class="topbar">
+          <div class="topbar-left">
+            <div class="topbar-title">Welcome back, <span id="current-username">User</span></div>
+            <div class="topbar-sub">Signed in to JAYNEX control panel</div>
+          </div>
+          <div class="topbar-right">
+            <span id="current-role" class="role-badge">ROLE</span>
+            <button id="logout-btn" class="logout-btn" type="button">Logout</button>
+          </div>
+        </div>
+
         <section id="page-dashboard" class="page active">
           <div class="title">Overview</div>
           <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
@@ -438,9 +666,9 @@
               <div class="stat-change">Live right now</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Messages</div>
-              <div class="stat-value" id="messages-count">0</div>
-              <div class="stat-change">Loaded from database</div>
+              <div class="stat-label">Open Tickets</div>
+              <div class="stat-value">7</div>
+              <div class="stat-change" style="color:#f59e0b;">Needs review</div>
             </div>
           </div>
 
@@ -448,8 +676,7 @@
             <div class="stat-label">Traffic Trend</div>
             <div class="chart-line">
               <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-                <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
-                  points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
+                <polyline fill="none" stroke="#46c2ff" stroke-width="1.5" points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
               </svg>
             </div>
           </div>
@@ -505,181 +732,207 @@
               </div>
             </div>
           </div>
-        </section>
 
-        <section id="page-messages" class="page">
-          <div class="title">Messages</div>
-          <div class="subtitle">Ordered list loaded from your database.</div>
-
-          <div class="message-list-card">
-            <div id="messages-list" class="loading">Loading messages...</div>
-          </div>
+          <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
         </section>
 
         <section id="page-customers" class="page">
           <div class="title">Customers</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Customer area visible for admin and staff.</div>
+        </section>
+
+        <section id="page-messages" class="page">
+          <div class="title">Messages</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-reports" class="page">
           <div class="title">Reports</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-sessions" class="page">
           <div class="title">Sessions</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-domains" class="page">
           <div class="title">Domains</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-integrations" class="page">
           <div class="title">Integrations</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-settings" class="page">
           <div class="title">Settings</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-billing" class="page">
           <div class="title">Billing</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-logs" class="page">
           <div class="title">Logs</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
 
         <section id="page-support" class="page">
           <div class="title">Support</div>
-          <div class="subtitle">This page is currently empty.</div>
+          <div class="subtitle">Only visible for admin.</div>
         </section>
-
-        <div class="footer-note">Dashboard connected to /api/orders.</div>
       </div>
     </main>
   </div>
 
   <script>
-    const API_URL = 'https://order-backend-one.vercel.app/api/orders';
+    const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
+
+    const loginScreen = document.getElementById('login-screen');
+    const appShell = document.getElementById('app-shell');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const currentUsernameEl = document.getElementById('current-username');
+    const currentRoleEl = document.getElementById('current-role');
+    const logoutBtn = document.getElementById('logout-btn');
 
     const navItems = document.querySelectorAll('.nav-item');
     const pages = document.querySelectorAll('.page');
+    const roleElements = document.querySelectorAll('[data-roles]');
 
-    navItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const page = item.dataset.page;
-        if (!page) return;
+    let currentUser = null;
 
-        navItems.forEach(nav => nav.classList.remove('active'));
-        item.classList.add('active');
+    function saveSession(user) {
+      localStorage.setItem('jaynex_user', JSON.stringify(user));
+    }
 
-        pages.forEach(section => section.classList.remove('active'));
-        const target = document.getElementById('page-' + page);
-        if (target) target.classList.add('active');
-
-        if (page === 'messages') {
-          loadMessages();
-        }
-      });
-    });
-
-    async function loadMessages() {
-      const list = document.getElementById('messages-list');
-
+    function getSession() {
       try {
-        list.className = 'loading';
-        list.textContent = 'Loading messages...';
-
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-          throw new Error('API error: ' + res.status);
-        }
-
-        const orders = await res.json();
-
-        document.getElementById('messages-count').textContent = Array.isArray(orders) ? orders.length : 0;
-
-        if (!Array.isArray(orders) || orders.length === 0) {
-          list.className = 'empty-state';
-          list.textContent = 'No messages found.';
-          return;
-        }
-
-        list.className = '';
-        list.innerHTML = orders.map(order => `
-          <div class="message-item">
-            <div class="message-top">
-              <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
-              <div class="message-time">${formatDate(order.created_at)}</div>
-            </div>
-
-            <div class="message-grid">
-              <div class="message-field">
-                <div class="label">Email</div>
-                <div class="value">${escapeHtml(order.email || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Phone</div>
-                <div class="value">${escapeHtml(order.phone || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Address</div>
-                <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Product</div>
-                <div class="value">${escapeHtml(order.product_name || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Quantity</div>
-                <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Price</div>
-                <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Order ID</div>
-                <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
-              </div>
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        console.error(err);
-        list.className = 'error-state';
-        list.textContent = 'Error loading messages.';
+        return JSON.parse(localStorage.getItem('jaynex_user'));
+      } catch {
+        return null;
       }
     }
 
-    function formatDate(dateString) {
-      if (!dateString) return 'Unknown date';
-      return new Date(dateString).toLocaleString();
+    function clearSession() {
+      localStorage.removeItem('jaynex_user');
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    function showLogin() {
+      loginScreen.classList.remove('hidden');
+      appShell.classList.add('hidden');
     }
 
-    loadMessages();
+    function showApp() {
+      loginScreen.classList.add('hidden');
+      appShell.classList.remove('hidden');
+    }
+
+    function applyRolePermissions(role) {
+      roleElements.forEach(el => {
+        const allowedRoles = (el.dataset.roles || '').split(',').map(r => r.trim());
+        if (allowedRoles.includes(role)) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+    }
+
+    function activatePage(pageName) {
+      const targetNav = Array.from(navItems).find(item =>
+        item.dataset.page === pageName && !item.classList.contains('hidden')
+      );
+      const targetPage = document.getElementById('page-' + pageName);
+
+      if (!targetNav || !targetPage) return;
+
+      navItems.forEach(nav => nav.classList.remove('active'));
+      pages.forEach(page => page.classList.remove('active'));
+
+      targetNav.classList.add('active');
+      targetPage.classList.add('active');
+    }
+
+    async function login(username, password) {
+      try {
+        loginError.textContent = '';
+
+        const res = await fetch(LOGIN_API, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          loginError.textContent = data.error || 'Wrong login';
+          return;
+        }
+
+        currentUser = {
+          id: data.user.id,
+          username: data.user.username,
+          role: data.user.role
+        };
+
+        saveSession(currentUser);
+        startUserSession();
+      } catch (err) {
+        console.error(err);
+        loginError.textContent = 'Server error';
+      }
+    }
+
+    function startUserSession() {
+      if (!currentUser) return;
+
+      currentUsernameEl.textContent = currentUser.username;
+      currentRoleEl.textContent = currentUser.role === 'admin' ? 'ADMIN' : 'STAFF';
+
+      applyRolePermissions(currentUser.role);
+      showApp();
+      activatePage('dashboard');
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      await login(username, password);
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      clearSession();
+      loginForm.reset();
+      showLogin();
+    });
+
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (item.classList.contains('hidden')) return;
+        const page = item.dataset.page;
+        if (!page) return;
+        activatePage(page);
+      });
+    });
+
+    const savedUser = getSession();
+    if (savedUser && savedUser.username && savedUser.role) {
+      currentUser = savedUser;
+      startUserSession();
+    } else {
+      showLogin();
+    }
   </script>
 </body>
 </html>
