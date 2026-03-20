@@ -965,6 +965,9 @@
   <script>
     const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
     const ORDERS_API = 'https://order-backend-one.vercel.app/api/orders';
+    const CUSTOMERS_API = 'https://order-backend-one.vercel.app/api/customers';
+
+    let customersCache = [];
 
     const loginScreen = document.getElementById('login-screen');
     const appShell = document.getElementById('app-shell');
@@ -1226,32 +1229,6 @@
         .replaceAll('>', '&gt;');
     }
 
-    function normalizeCustomers(customers) {
-      return customers.map(customer => ({
-        name: customer.name || '',
-        address: customer.address || '',
-        email: customer.email || '',
-        phone: customer.phone || '',
-        saved: !!customer.saved,
-        reviewed: !!customer.reviewed,
-        reviewedBy: customer.reviewedBy || '',
-        reviewedAt: customer.reviewedAt || ''
-      }));
-    }
-
-    function getStoredCustomers() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('jaynex_customers') || '[]');
-        return Array.isArray(saved) ? normalizeCustomers(saved) : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveCustomers(customers) {
-      localStorage.setItem('jaynex_customers', JSON.stringify(customers));
-    }
-
     function getCustomerCopyText(customer) {
       return [
         `Name: ${customer.name || ''}`,
@@ -1263,6 +1240,78 @@
         `Reviewed At: ${customer.reviewedAt ? formatDate(customer.reviewedAt) : ''}`
       ].join('\n');
     }
+
+    async function loadCustomers() {
+  try {
+    const res = await fetch(CUSTOMERS_API);
+    const data = await res.json();
+
+    if (!res.ok || !Array.isArray(data)) {
+      throw new Error('Failed to load customers');
+    }
+
+    customersCache = data;
+    rerenderCustomers();
+  } catch (err) {
+    console.error('LOAD CUSTOMERS ERROR:', err);
+    customersCache = [];
+    rerenderCustomers();
+  }
+}
+
+async function createCustomer(customer) {
+  const res = await fetch(CUSTOMERS_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(customer)
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to create customer');
+  }
+
+  return data.customer;
+}
+
+async function updateCustomer(customer) {
+  const res = await fetch(CUSTOMERS_API, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(customer)
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to update customer');
+  }
+
+  return data.customer;
+}
+
+async function deleteCustomer(id) {
+  const res = await fetch(CUSTOMERS_API, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to delete customer');
+  }
+
+  return true;
+}
 
     async function copyCustomer(customer, button) {
       const text = getCustomerCopyText(customer);
@@ -1281,225 +1330,211 @@
       }
     }
 
-    function renderAdminCustomerCard(customer, index) {
-      const card = document.createElement('div');
-      card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
+    function renderAdminCustomerCard(customer) {
+  const card = document.createElement('div');
+  card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
 
-      const reviewedInfo = customer.reviewed
-        ? `
-          <div class="customer-status show">
-            Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}
-            ${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}
-          </div>
-        `
-        : '';
+  const reviewedInfo = customer.reviewed
+    ? `
+      <div class="customer-status show">
+        Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}
+        ${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}
+      </div>
+    `
+    : '';
 
-      if (customer.saved) {
-        card.innerHTML = `
-          <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
+  if (customer.saved) {
+    card.innerHTML = `
+      <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
 
-          <div class="customer-display-field">
-            <div class="customer-display-label">Address</div>
-            <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
-          </div>
+      <div class="customer-display-field">
+        <div class="customer-display-label">Address</div>
+        <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
+      </div>
 
-          <div class="customer-display-field">
-            <div class="customer-display-label">Email</div>
-            <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
-          </div>
+      <div class="customer-display-field">
+        <div class="customer-display-label">Email</div>
+        <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
+      </div>
 
-          <div class="customer-display-field">
-            <div class="customer-display-label">Phone</div>
-            <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
-          </div>
+      <div class="customer-display-field">
+        <div class="customer-display-label">Phone</div>
+        <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
+      </div>
 
-          ${reviewedInfo}
+      ${reviewedInfo}
 
-          <div class="customer-card-actions">
-            <button class="customer-delete-btn" type="button">Delete</button>
-            <button class="customer-copy-btn" type="button">Copy</button>
-          </div>
-        `;
+      <div class="customer-card-actions">
+        <button class="customer-delete-btn" type="button">Delete</button>
+        <button class="customer-copy-btn" type="button">Copy</button>
+      </div>
+    `;
 
-        card.querySelector('.customer-delete-btn').addEventListener('click', () => {
-          const customers = getStoredCustomers();
-          customers.splice(index, 1);
-          saveCustomers(customers);
-          rerenderCustomers();
-        });
-
-        card.querySelector('.customer-copy-btn').addEventListener('click', (e) => {
-          copyCustomer(customer, e.currentTarget);
-        });
-
-        return card;
+    card.querySelector('.customer-delete-btn').addEventListener('click', async () => {
+      try {
+        await deleteCustomer(customer.id);
+        await loadCustomers();
+      } catch (err) {
+        console.error(err);
       }
-
-      card.innerHTML = `
-        <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeAttribute(customer.name || '')}" />
-
-        <div class="customer-field">
-          <div class="customer-label">Address</div>
-          <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Email</div>
-          <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Phone</div>
-          <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" />
-        </div>
-
-        <div class="customer-card-actions">
-          <button class="customer-save-btn" type="button">Save</button>
-          <button class="customer-delete-btn" type="button">Delete</button>
-        </div>
-      `;
-
-      const nameInput = card.querySelector('.customer-name-input');
-      const addressInput = card.querySelector('.customer-address');
-      const emailInput = card.querySelector('.customer-email');
-      const phoneInput = card.querySelector('.customer-phone');
-      const saveBtn = card.querySelector('.customer-save-btn');
-      const deleteBtn = card.querySelector('.customer-delete-btn');
-
-      function persistDraft() {
-        const customers = getStoredCustomers();
-        customers[index] = {
-          ...customers[index],
-          name: nameInput.value,
-          address: addressInput.value,
-          email: emailInput.value,
-          phone: phoneInput.value,
-          saved: false,
-          reviewed: customers[index]?.reviewed || false,
-          reviewedBy: customers[index]?.reviewedBy || '',
-          reviewedAt: customers[index]?.reviewedAt || ''
-        };
-        saveCustomers(customers);
-      }
-
-      [nameInput, addressInput, emailInput, phoneInput].forEach(input => {
-        input.addEventListener('input', persistDraft);
-      });
-
-      saveBtn.addEventListener('click', () => {
-        const customers = getStoredCustomers();
-        customers[index] = {
-          name: nameInput.value.trim(),
-          address: addressInput.value.trim(),
-          email: emailInput.value.trim(),
-          phone: phoneInput.value.trim(),
-          saved: true,
-          reviewed: customers[index]?.reviewed || false,
-          reviewedBy: customers[index]?.reviewedBy || '',
-          reviewedAt: customers[index]?.reviewedAt || ''
-        };
-        saveCustomers(customers);
-        rerenderCustomers();
-      });
-
-      deleteBtn.addEventListener('click', () => {
-        const customers = getStoredCustomers();
-        customers.splice(index, 1);
-        saveCustomers(customers);
-        rerenderCustomers();
-      });
-
-      return card;
-    }
-
-    function renderStaffCustomerCard(customer, index) {
-      const card = document.createElement('div');
-      card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
-
-      card.innerHTML = `
-        <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Address</div>
-          <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Email</div>
-          <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Phone</div>
-          <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
-        </div>
-
-        <div class="customer-card-actions">
-          <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>
-            ${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}
-          </button>
-          <button class="customer-copy-btn" type="button">Copy</button>
-        </div>
-
-        <div class="customer-status ${customer.reviewed ? 'show' : ''}">
-          ${customer.reviewed
-            ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}`
-            : 'Bearbeitet'}
-        </div>
-      `;
-
-      const reviewBtn = card.querySelector('.customer-review-btn');
-      const copyBtn = card.querySelector('.customer-copy-btn');
-
-      reviewBtn.addEventListener('click', () => {
-        const customers = getStoredCustomers();
-        if (!customers[index]) return;
-
-        customers[index].reviewed = true;
-        customers[index].reviewedBy = currentUser?.username || 'staff';
-        customers[index].reviewedAt = new Date().toISOString();
-
-        saveCustomers(customers);
-        rerenderCustomers();
-      });
-
-      copyBtn.addEventListener('click', (e) => {
-        copyCustomer(customer, e.currentTarget);
-      });
-
-      return card;
-    }
-
-    function rerenderCustomers() {
-      if (!customersList) return;
-
-      const customers = getStoredCustomers();
-      customersList.innerHTML = '';
-
-      customers.forEach((customer, index) => {
-        const card = currentUser?.role === 'admin'
-          ? renderAdminCustomerCard(customer, index)
-          : renderStaffCustomerCard(customer, index);
-
-        customersList.appendChild(card);
-      });
-    }
-
-    addCustomerBtn.addEventListener('click', () => {
-      const customers = getStoredCustomers();
-      customers.unshift({
-        name: '',
-        address: '',
-        email: '',
-        phone: '',
-        saved: false,
-        reviewed: false,
-        reviewedBy: '',
-        reviewedAt: ''
-      });
-      saveCustomers(customers);
-      rerenderCustomers();
     });
+
+    card.querySelector('.customer-copy-btn').addEventListener('click', (e) => {
+      copyCustomer(customer, e.currentTarget);
+    });
+
+    return card;
+  }
+
+  card.innerHTML = `
+    <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeAttribute(customer.name || '')}" />
+
+    <div class="customer-field">
+      <div class="customer-label">Address</div>
+      <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" />
+    </div>
+
+    <div class="customer-field">
+      <div class="customer-label">Email</div>
+      <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" />
+    </div>
+
+    <div class="customer-field">
+      <div class="customer-label">Phone</div>
+      <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" />
+    </div>
+
+    <div class="customer-card-actions">
+      <button class="customer-save-btn" type="button">Save</button>
+      <button class="customer-delete-btn" type="button">Delete</button>
+    </div>
+  `;
+
+  const nameInput = card.querySelector('.customer-name-input');
+  const addressInput = card.querySelector('.customer-address');
+  const emailInput = card.querySelector('.customer-email');
+  const phoneInput = card.querySelector('.customer-phone');
+  const saveBtn = card.querySelector('.customer-save-btn');
+  const deleteBtn = card.querySelector('.customer-delete-btn');
+
+  saveBtn.addEventListener('click', async () => {
+    try {
+      await updateCustomer({
+        id: customer.id,
+        name: nameInput.value.trim(),
+        address: addressInput.value.trim(),
+        email: emailInput.value.trim(),
+        phone: phoneInput.value.trim(),
+        saved: true
+      });
+
+      await loadCustomers();
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  deleteBtn.addEventListener('click', async () => {
+    try {
+      await deleteCustomer(customer.id);
+      await loadCustomers();
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  return card;
+}
+    
+    function renderStaffCustomerCard(customer) {
+  const card = document.createElement('div');
+  card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
+
+  card.innerHTML = `
+    <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
+
+    <div class="customer-display-field">
+      <div class="customer-display-label">Address</div>
+      <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
+    </div>
+
+    <div class="customer-display-field">
+      <div class="customer-display-label">Email</div>
+      <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
+    </div>
+
+    <div class="customer-display-field">
+      <div class="customer-display-label">Phone</div>
+      <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
+    </div>
+
+    <div class="customer-card-actions">
+      <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>
+        ${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}
+      </button>
+      <button class="customer-copy-btn" type="button">Copy</button>
+    </div>
+
+    <div class="customer-status ${customer.reviewed ? 'show' : ''}">
+      ${customer.reviewed
+        ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}`
+        : 'Bearbeitet'}
+    </div>
+  `;
+
+  const reviewBtn = card.querySelector('.customer-review-btn');
+  const copyBtn = card.querySelector('.customer-copy-btn');
+
+  reviewBtn.addEventListener('click', async () => {
+    try {
+      await updateCustomer({
+        id: customer.id,
+        reviewed: true,
+        reviewedBy: currentUser?.username || 'staff'
+      });
+
+      await loadCustomers();
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  copyBtn.addEventListener('click', (e) => {
+    copyCustomer(customer, e.currentTarget);
+  });
+
+  return card;
+}
+
+function rerenderCustomers() {
+  if (!customersList) return;
+
+  customersList.innerHTML = '';
+
+  customersCache.forEach((customer) => {
+    const card = currentUser?.role === 'admin'
+      ? renderAdminCustomerCard(customer)
+      : renderStaffCustomerCard(customer);
+
+    customersList.appendChild(card);
+  });
+}
+
+ addCustomerBtn.addEventListener('click', async () => {
+  try {
+    await createCustomer({
+      name: '',
+      address: '',
+      email: '',
+      phone: '',
+      saved: false
+    });
+
+    await loadCustomers();
+  } catch (err) {
+    console.error(err);
+  }
+});
 
     const savedUser = getSession();
     if (savedUser && savedUser.username && savedUser.role) {
