@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -248,16 +246,6 @@
       transition: border-color 0.3s;
     }
 
-    .visitor-card.approved {
-      border-color: #1a5c38;
-      background: linear-gradient(180deg, #0a1e14 0%, #071510 100%);
-    }
-
-    .visitor-card.denied {
-      border-color: #5c1a1a;
-      background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%);
-    }
-
     .badge {
       display: inline-block;
       background: #182441;
@@ -319,26 +307,6 @@
       transition: 0.2s ease;
     }
 
-    .btn-approve {
-      background: #15532e;
-      color: #6ee7a0;
-      border: 1px solid #1e7a41;
-    }
-
-    .btn-approve:hover {
-      background: #1a6b39;
-    }
-
-    .btn-deny {
-      background: #4a1515;
-      color: #f87171;
-      border: 1px solid #7a1e1e;
-    }
-
-    .btn-deny:hover {
-      background: #5c1a1a;
-    }
-
     .btn-detail {
       background: #131c31;
       color: #d5def3;
@@ -350,61 +318,6 @@
 
     .btn-detail:hover {
       background: #182441;
-    }
-
-    .btn-block {
-      background: #1a1010;
-      color: #f87171;
-      border: 1px solid #4a1515;
-      font-size: 12px;
-      border-radius: 10px;
-      padding: 9px 12px;
-    }
-
-    .btn-block:hover {
-      background: #291515;
-    }
-
-    .status-banner {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-top: 10px;
-    }
-
-    .status-banner.show {
-      display: flex;
-    }
-
-    .status-banner.approved {
-      background: #0e3d22;
-      color: #6ee7a0;
-      border: 1px solid #1e7a41;
-    }
-
-    .status-banner.denied {
-      background: #3d0e0e;
-      color: #f87171;
-      border: 1px solid #7a1e1e;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .dot-approve {
-      background: #22c55e;
-    }
-
-    .dot-deny {
-      background: #ef4444;
     }
 
     .risk-row {
@@ -562,6 +475,166 @@
       text-align: center;
     }
 
+    .message-item {
+      padding: 16px 0;
+      border-bottom: 1px solid #1a2744;
+    }
+
+    .message-item:last-child {
+      border-bottom: none;
+    }
+
+    .message-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .message-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #edf3ff;
+    }
+
+    .message-time {
+      color: #8ea0c9;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .message-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 18px;
+    }
+
+    .message-field {
+      min-width: 0;
+    }
+
+    .loading,
+    .empty-state,
+    .error-state {
+      padding: 20px 0;
+      color: #b8c7ea;
+      font-size: 14px;
+    }
+
+    .error-state {
+      color: #fda4af;
+    }
+
+    .customers-toolbar {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .add-customer-btn {
+      border: 1px solid #2a3f69;
+      background: linear-gradient(180deg, #182449 0%, #121c38 100%);
+      color: #edf3ff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .add-customer-btn:hover {
+      background: #1a2950;
+    }
+
+    .customers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .customer-card {
+      background: linear-gradient(145deg, #0a1224, #070e1c);
+      border: 1px solid #1a2744;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .customer-name-input,
+    .customer-input {
+      width: 100%;
+      border: 1px solid #26395f;
+      background: #0b1326;
+      color: #edf3ff;
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .customer-name-input {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .customer-name-input:focus,
+    .customer-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.14);
+    }
+
+    .customer-field {
+      margin-bottom: 12px;
+    }
+
+    .customer-label {
+      font-size: 12px;
+      color: #8ea0c9;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .customer-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .customer-save-btn,
+    .customer-delete-btn {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .customer-save-btn {
+      background: #131c31;
+      color: #d5def3;
+      border: 1px solid #26395f;
+    }
+
+    .customer-save-btn:hover {
+      background: #182441;
+    }
+
+    .customer-delete-btn {
+      background: #3a1212;
+      color: #fca5a5;
+      border: 1px solid #6b1f1f;
+    }
+
+    .customer-delete-btn:hover {
+      background: #4a1515;
+    }
+
     @media (max-width: 900px) {
       .app-shell {
         flex-direction: column;
@@ -582,98 +655,6 @@
         align-items: flex-start;
       }
     }
-    .message-item {
-  padding: 16px 0;
-  border-bottom: 1px solid #1a2744;
-}
-
-.message-item:last-child {
-  border-bottom: none;
-}
-
-.message-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.message-name {
-  font-size: 17px;
-  font-weight: 700;
-  color: #edf3ff;
-}
-
-.message-time {
-  color: #8ea0c9;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.message-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px 18px;
-}
-
-.message-field {
-  min-width: 0;
-}
-
-.loading,
-.empty-state,
-.error-state {
-  padding: 20px 0;
-  color: #b8c7ea;
-  font-size: 14px;
-}
-
-.error-state {
-  color: #fda4af;
-}
-    .customers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.customer-card {
-  background: linear-gradient(145deg, #0a1224, #070e1c);
-  border: 1px solid #1a2744;
-  border-radius: 18px;
-  padding: 20px;
-  transition: 0.2s;
-}
-
-.customer-card:hover {
-  transform: translateY(-4px);
-  border-color: #2f4cff;
-}
-
-.customer-name {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #edf3ff;
-}
-
-.customer-field {
-  margin-bottom: 10px;
-}
-
-.customer-label {
-  font-size: 12px;
-  color: #8ea0c9;
-  margin-bottom: 2px;
-}
-
-.customer-value {
-  font-size: 14px;
-  color: #c9d6ff;
-  word-break: break-word;
-}
   </style>
 </head>
 <body>
@@ -828,23 +809,25 @@
           <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
         </section>
 
-       <section id="page-customers" class="page">
-  <div class="title">Customers</div>
-  <div class="subtitle">Customer overview</div>
+        <section id="page-customers" class="page">
+          <div class="title">Customers</div>
+          <div class="subtitle">Create and manage customer cards manually.</div>
 
-  <div id="customers-list" class="customers-grid">
-    Loading customers...
-  </div>
-</section>
+          <div class="customers-toolbar">
+            <button id="add-customer-btn" class="add-customer-btn">+ Add Customer</button>
+          </div>
 
-      <section id="page-messages" class="page">
-  <div class="title">Messages</div>
-  <div class="subtitle">Orders loaded from your database.</div>
+          <div id="customers-list" class="customers-grid"></div>
+        </section>
 
-  <div class="stat-card">
-    <div id="messages-list" style="color:#b8c7ea;">Loading messages...</div>
-  </div>
-</section>
+        <section id="page-messages" class="page">
+          <div class="title">Messages</div>
+          <div class="subtitle">Orders loaded from your database.</div>
+
+          <div class="stat-card">
+            <div id="messages-list" style="color:#b8c7ea;">Loading messages...</div>
+          </div>
+        </section>
 
         <section id="page-reports" class="page">
           <div class="title">Reports</div>
@@ -900,6 +883,8 @@
     const currentUsernameEl = document.getElementById('current-username');
     const currentRoleEl = document.getElementById('current-role');
     const logoutBtn = document.getElementById('logout-btn');
+    const customersList = document.getElementById('customers-list');
+    const addCustomerBtn = document.getElementById('add-customer-btn');
 
     const navItems = document.querySelectorAll('.nav-item');
     const pages = document.querySelectorAll('.page');
@@ -945,27 +930,23 @@
     }
 
     function activatePage(pageName) {
-  const targetNav = Array.from(navItems).find(item =>
-    item.dataset.page === pageName && !item.classList.contains('hidden')
-  );
-  const targetPage = document.getElementById('page-' + pageName);
+      const targetNav = Array.from(navItems).find(item =>
+        item.dataset.page === pageName && !item.classList.contains('hidden')
+      );
+      const targetPage = document.getElementById('page-' + pageName);
 
-  if (!targetNav || !targetPage) return;
+      if (!targetNav || !targetPage) return;
 
-  navItems.forEach(nav => nav.classList.remove('active'));
-  pages.forEach(page => page.classList.remove('active'));
+      navItems.forEach(nav => nav.classList.remove('active'));
+      pages.forEach(page => page.classList.remove('active'));
 
-  targetNav.classList.add('active');
-  targetPage.classList.add('active');
+      targetNav.classList.add('active');
+      targetPage.classList.add('active');
 
-  if (pageName === 'messages' && currentUser?.role === 'admin') {
-    loadMessages();
-  }
-
-  if (pageName === 'customers') {
-    loadCustomers();
-  }
-}
+      if (pageName === 'messages' && currentUser?.role === 'admin') {
+        loadMessages();
+      }
+    }
 
     async function login(username, password) {
       try {
@@ -1025,15 +1006,198 @@
       showLogin();
     });
 
-   navItems.forEach(item => {
-  item.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (item.classList.contains('hidden')) return;
-    const page = item.dataset.page;
-    if (!page) return;
-    activatePage(page);
-  });
-});
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (item.classList.contains('hidden')) return;
+        const page = item.dataset.page;
+        if (!page) return;
+        activatePage(page);
+      });
+    });
+
+    async function loadMessages() {
+      const list = document.getElementById('messages-list');
+      if (!list) return;
+
+      try {
+        list.className = 'loading';
+        list.textContent = 'Loading messages...';
+
+        const res = await fetch(ORDERS_API);
+        if (!res.ok) {
+          throw new Error('API error: ' + res.status);
+        }
+
+        let orders = await res.json();
+
+        if (!Array.isArray(orders)) {
+          orders = [];
+        }
+
+        orders.sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA;
+        });
+
+        if (orders.length === 0) {
+          list.className = 'empty-state';
+          list.textContent = 'No messages found.';
+          return;
+        }
+
+        list.className = '';
+        list.innerHTML = orders.map(order => `
+          <div class="message-item">
+            <div class="message-top">
+              <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
+              <div class="message-time">${formatDate(order.created_at)}</div>
+            </div>
+
+            <div class="message-grid">
+              <div class="message-field">
+                <div class="label">Email</div>
+                <div class="value">${escapeHtml(order.email || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Phone</div>
+                <div class="value">${escapeHtml(order.phone || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Address</div>
+                <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Product</div>
+                <div class="value">${escapeHtml(order.product_name || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Quantity</div>
+                <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Price</div>
+                <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Order ID</div>
+                <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+        list.className = 'error-state';
+        list.textContent = 'Error loading messages.';
+      }
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'Unknown date';
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return 'Unknown date';
+      return date.toLocaleString();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function createCustomerCard(data = {}) {
+      const card = document.createElement('div');
+      card.className = 'customer-card';
+
+      card.innerHTML = `
+        <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeHtml(data.name || '')}" />
+
+        <div class="customer-field">
+          <div class="customer-label">Address</div>
+          <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeHtml(data.address || '')}" />
+        </div>
+
+        <div class="customer-field">
+          <div class="customer-label">Email</div>
+          <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeHtml(data.email || '')}" />
+        </div>
+
+        <div class="customer-field">
+          <div class="customer-label">Phone</div>
+          <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeHtml(data.phone || '')}" />
+        </div>
+
+        <div class="customer-card-actions">
+          <button class="customer-save-btn" type="button">Save</button>
+          <button class="customer-delete-btn" type="button">Delete</button>
+        </div>
+      `;
+
+      const saveBtn = card.querySelector('.customer-save-btn');
+      const deleteBtn = card.querySelector('.customer-delete-btn');
+
+      saveBtn.addEventListener('click', () => {
+        saveCustomersToLocalStorage();
+      });
+
+      deleteBtn.addEventListener('click', () => {
+        card.remove();
+        saveCustomersToLocalStorage();
+      });
+
+      const inputs = card.querySelectorAll('input');
+      inputs.forEach(input => {
+        input.addEventListener('input', () => {
+          saveCustomersToLocalStorage();
+        });
+      });
+
+      customersList.appendChild(card);
+    }
+
+    function saveCustomersToLocalStorage() {
+      const cards = Array.from(document.querySelectorAll('.customer-card'));
+
+      const customers = cards.map(card => ({
+        name: card.querySelector('.customer-name-input')?.value || '',
+        address: card.querySelector('.customer-address')?.value || '',
+        email: card.querySelector('.customer-email')?.value || '',
+        phone: card.querySelector('.customer-phone')?.value || ''
+      }));
+
+      localStorage.setItem('jaynex_customers', JSON.stringify(customers));
+    }
+
+    function loadCustomersFromLocalStorage() {
+      const saved = localStorage.getItem('jaynex_customers');
+      if (!saved) return;
+
+      try {
+        const customers = JSON.parse(saved);
+        if (!Array.isArray(customers)) return;
+
+        customersList.innerHTML = '';
+        customers.forEach(customer => createCustomerCard(customer));
+      } catch (err) {
+        console.error('CUSTOMER LOAD ERROR:', err);
+      }
+    }
+
+    addCustomerBtn.addEventListener('click', () => {
+      createCustomerCard();
+      saveCustomersToLocalStorage();
+    });
 
     const savedUser = getSession();
     if (savedUser && savedUser.username && savedUser.role) {
@@ -1042,147 +1206,8 @@
     } else {
       showLogin();
     }
-    async function loadMessages() {
-  const list = document.getElementById('messages-list');
-  if (!list) return;
 
-  try {
-    list.className = 'loading';
-    list.textContent = 'Loading messages...';
-
-    const res = await fetch(ORDERS_API);
-    if (!res.ok) {
-      throw new Error('API error: ' + res.status);
-    }
-
-    let orders = await res.json();
-
-    if (!Array.isArray(orders)) {
-      orders = [];
-    }
-
-    orders.sort((a, b) => {
-      const dateA = new Date(a.created_at || 0).getTime();
-      const dateB = new Date(b.created_at || 0).getTime();
-      return dateB - dateA;
-    });
-
-    if (orders.length === 0) {
-      list.className = 'empty-state';
-      list.textContent = 'No messages found.';
-      return;
-    }
-
-    list.className = '';
-    list.innerHTML = orders.map(order => `
-      <div class="message-item">
-        <div class="message-top">
-          <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
-          <div class="message-time">${formatDate(order.created_at)}</div>
-        </div>
-
-        <div class="message-grid">
-          <div class="message-field">
-            <div class="label">Email</div>
-            <div class="value">${escapeHtml(order.email || '—')}</div>
-          </div>
-
-          <div class="message-field">
-            <div class="label">Phone</div>
-            <div class="value">${escapeHtml(order.phone || '—')}</div>
-          </div>
-
-          <div class="message-field">
-            <div class="label">Address</div>
-            <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
-          </div>
-
-          <div class="message-field">
-            <div class="label">Product</div>
-            <div class="value">${escapeHtml(order.product_name || '—')}</div>
-          </div>
-
-          <div class="message-field">
-            <div class="label">Quantity</div>
-            <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
-          </div>
-
-          <div class="message-field">
-            <div class="label">Price</div>
-            <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
-          </div>
-
-          <div class="message-field">
-            <div class="label">Order ID</div>
-            <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error(err);
-    list.className = 'error-state';
-    list.textContent = 'Error loading messages.';
-  }
-}
-    function formatDate(dateString) {
-  if (!dateString) return 'Unknown date';
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return 'Unknown date';
-  return date.toLocaleString();
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-    async function loadCustomers() {
-  const container = document.getElementById('customers-list');
-  if (!container) return;
-
-  try {
-    container.textContent = 'Loading customers...';
-
-    const res = await fetch(ORDERS_API);
-    const data = await res.json();
-
-    if (!Array.isArray(data) || data.length === 0) {
-      container.textContent = 'No customers found.';
-      return;
-    }
-
-    container.innerHTML = data.map(order => `
-      <div class="customer-card">
-        <div class="customer-name">
-          ${escapeHtml(order.customer_name || 'Unknown')}
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Email</div>
-          <div class="customer-value">${escapeHtml(order.email || '—')}</div>
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Phone</div>
-          <div class="customer-value">${escapeHtml(order.phone || '—')}</div>
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Address</div>
-          <div class="customer-value">${escapeHtml(order.shipping_address || '—')}</div>
-        </div>
-      </div>
-    `).join('');
-
-  } catch (err) {
-    console.error(err);
-    container.textContent = 'Error loading customers.';
-  }
-}
+    loadCustomersFromLocalStorage();
   </script>
 </body>
 </html>
