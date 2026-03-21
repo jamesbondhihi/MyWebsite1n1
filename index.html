@@ -947,12 +947,24 @@
           <div class="title">Users</div>
           <div class="subtitle">Only admin can manage admin and staff accounts.</div>
 
-          <div class="message-wrapper">
+          <div class="message-wrapper" style="margin-bottom:20px;">
             <div class="customers-toolbar">
               <button id="add-user-btn" class="add-customer-btn">+ Add User</button>
             </div>
 
             <div id="users-list" class="customers-grid"></div>
+          </div>
+
+          <div class="message-wrapper" style="margin-bottom:20px;">
+            <div class="title" style="font-size:22px; margin-bottom:8px;">Currently Logged In</div>
+            <div class="subtitle" style="margin-bottom:16px;">Only admins can see who is online right now.</div>
+            <div id="active-sessions-list"></div>
+          </div>
+
+          <div class="message-wrapper" style="margin-bottom:20px;">
+            <div class="title" style="font-size:22px; margin-bottom:8px;">Timestamp</div>
+            <div class="subtitle" style="margin-bottom:16px;">Login time, logout time and session duration.</div>
+            <div id="sessions-history-list"></div>
           </div>
         </section>
 
@@ -1001,6 +1013,8 @@
 
   <script>
     const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
+    const LOGOUT_API = 'https://order-backend-one.vercel.app/api/logout';
+    const SESSIONS_API = 'https://order-backend-one.vercel.app/api/sessions';
     const ORDERS_API = 'https://order-backend-one.vercel.app/api/orders';
     const CUSTOMERS_API = 'https://order-backend-one.vercel.app/api/customers';
     const USERS_API = 'https://order-backend-one.vercel.app/api/users';
@@ -1020,6 +1034,8 @@
     const addCustomerBtn = document.getElementById('add-customer-btn');
     const usersList = document.getElementById('users-list');
     const addUserBtn = document.getElementById('add-user-btn');
+    const activeSessionsList = document.getElementById('active-sessions-list');
+    const sessionsHistoryList = document.getElementById('sessions-history-list');
 
     const navItems = document.querySelectorAll('.nav-item');
     const pages = document.querySelectorAll('.page');
@@ -1044,11 +1060,11 @@
     }
 
     function getAuthHeaders() {
-  return {
-    'Content-Type': 'application/json',
-    'x-user': JSON.stringify(currentUser || {})
-  };
-}
+      return {
+        'Content-Type': 'application/json',
+        'x-user': JSON.stringify(currentUser || {})
+      };
+    }
 
     function showLogin() {
       loginScreen.classList.remove('hidden');
@@ -1095,6 +1111,7 @@
 
       if (pageName === 'users' && currentUser?.role === 'admin') {
         loadUsers();
+        loadSessions();
       }
     }
 
@@ -1120,7 +1137,9 @@
         currentUser = {
           id: data.user.id,
           username: data.user.username,
-          role: data.user.role
+          role: data.user.role,
+          sessionId: data.session?.id || null,
+          loginAt: data.session?.login_at || null
         };
 
         saveSession(currentUser);
@@ -1182,7 +1201,23 @@
       await login(username, password);
     });
 
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        if (currentUser?.sessionId) {
+          await fetch(LOGOUT_API, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              sessionId: currentUser.sessionId
+            })
+          });
+        }
+      } catch (err) {
+        console.error('LOGOUT REQUEST ERROR:', err);
+      }
+
       currentUser = null;
       clearSession();
       stopCustomersLiveUpdates();
@@ -1291,6 +1326,14 @@
       return date.toLocaleString();
     }
 
+    function formatDuration(totalSeconds) {
+      const seconds = Number(totalSeconds || 0);
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    }
+
     function escapeHtml(str) {
       return String(str)
         .replaceAll('&', '&amp;')
@@ -1372,38 +1415,38 @@
       return data.customer;
     }
 
-      async function updateCustomer(customer) {
-  const payload = {
-    ...customer
-  };
+    async function updateCustomer(customer) {
+      const payload = {
+        ...customer
+      };
 
-  if (payload.reviewedBy !== undefined) {
-    payload.reviewed_by = payload.reviewedBy;
-    delete payload.reviewedBy;
-  }
+      if (payload.reviewedBy !== undefined) {
+        payload.reviewed_by = payload.reviewedBy;
+        delete payload.reviewedBy;
+      }
 
-  if (payload.reviewedAt !== undefined) {
-    payload.reviewed_at = payload.reviewedAt;
-    delete payload.reviewedAt;
-  }
+      if (payload.reviewedAt !== undefined) {
+        payload.reviewed_at = payload.reviewedAt;
+        delete payload.reviewedAt;
+      }
 
-  const res = await fetch(CUSTOMERS_API, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+      const res = await fetch(CUSTOMERS_API, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-  const data = await res.json();
+      const data = await res.json();
 
-  if (!res.ok || !data.success) {
-    throw new Error(data.error || 'Failed to update customer');
-  }
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update customer');
+      }
 
-  return data.customer;
-}
-    
+      return data.customer;
+    }
+
     async function deleteCustomer(id) {
       const res = await fetch(CUSTOMERS_API, {
         method: 'DELETE',
@@ -1687,8 +1730,9 @@
         usersList.innerHTML = '<div class="loading">Loading users...</div>';
 
         const res = await fetch(USERS_API, {
-  headers: getAuthHeaders()
-});
+          headers: getAuthHeaders()
+        });
+
         const data = await res.json();
 
         if (!res.ok || !Array.isArray(data)) {
@@ -1745,15 +1789,15 @@
           saveBtn.addEventListener('click', async () => {
             try {
               const res = await fetch(USERS_API, {
-  method: 'PUT',
-  headers: getAuthHeaders(),
-  body: JSON.stringify({
-    id: user.id,
-    username: usernameInput.value.trim(),
-    password: passwordInput.value.trim(),
-    role: roleSelect.value
-  })
-});
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                  id: user.id,
+                  username: usernameInput.value.trim(),
+                  password: passwordInput.value.trim(),
+                  role: roleSelect.value
+                })
+              });
 
               const result = await res.json();
 
@@ -1771,12 +1815,12 @@
           deleteBtn.addEventListener('click', async () => {
             try {
               const res = await fetch(USERS_API, {
-  method: 'DELETE',
-  headers: getAuthHeaders(),
-  body: JSON.stringify({
-    id: user.id
-  })
-});
+                method: 'DELETE',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                  id: user.id
+                })
+              });
 
               const result = await res.json();
 
@@ -1819,14 +1863,14 @@
       }
 
       const res = await fetch(USERS_API, {
-  method: 'POST',
-  headers: getAuthHeaders(),
-  body: JSON.stringify({
-    username: username.trim(),
-    password,
-    role: cleanRole
-  })
-});
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+          role: cleanRole
+        })
+      });
 
       const result = await res.json();
 
@@ -1837,9 +1881,100 @@
       return result.user;
     }
 
+    async function loadSessions() {
+      if (currentUser?.role !== 'admin') return;
+      if (!activeSessionsList || !sessionsHistoryList) return;
+
+      try {
+        activeSessionsList.innerHTML = '<div class="loading">Loading active sessions...</div>';
+        sessionsHistoryList.innerHTML = '<div class="loading">Loading session history...</div>';
+
+        const res = await fetch(SESSIONS_API, {
+          headers: getAuthHeaders()
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data?.error || 'Failed to load sessions');
+        }
+
+        const active = Array.isArray(data.active) ? data.active : [];
+        const history = Array.isArray(data.history) ? data.history : [];
+
+        if (active.length === 0) {
+          activeSessionsList.innerHTML = '<div class="empty-state">No active users right now.</div>';
+        } else {
+          activeSessionsList.innerHTML = active.map(session => `
+            <div class="message-item">
+              <div class="message-top">
+                <div class="message-name">${escapeHtml(session.username)}</div>
+                <div class="message-time">${formatDate(session.login_at)}</div>
+              </div>
+
+              <div class="message-grid">
+                <div class="message-field">
+                  <div class="label">Role</div>
+                  <div class="value">${escapeHtml(session.role || '—')}</div>
+                </div>
+                <div class="message-field">
+                  <div class="label">Login At</div>
+                  <div class="value">${escapeHtml(formatDate(session.login_at))}</div>
+                </div>
+                <div class="message-field">
+                  <div class="label">Status</div>
+                  <div class="value">Online</div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        if (history.length === 0) {
+          sessionsHistoryList.innerHTML = '<div class="empty-state">No session history found.</div>';
+        } else {
+          sessionsHistoryList.innerHTML = history.map(session => `
+            <div class="message-item">
+              <div class="message-top">
+                <div class="message-name">${escapeHtml(session.username)}</div>
+                <div class="message-time">${formatDate(session.login_at)}</div>
+              </div>
+
+              <div class="message-grid">
+                <div class="message-field">
+                  <div class="label">Role</div>
+                  <div class="value">${escapeHtml(session.role || '—')}</div>
+                </div>
+                <div class="message-field">
+                  <div class="label">Login At</div>
+                  <div class="value">${escapeHtml(formatDate(session.login_at))}</div>
+                </div>
+                <div class="message-field">
+                  <div class="label">Logout At</div>
+                  <div class="value">${escapeHtml(session.logout_at ? formatDate(session.logout_at) : 'Still online')}</div>
+                </div>
+                <div class="message-field">
+                  <div class="label">Duration</div>
+                  <div class="value">${escapeHtml(formatDuration(session.duration_seconds))}</div>
+                </div>
+                <div class="message-field">
+                  <div class="label">Status</div>
+                  <div class="value">${escapeHtml(session.session_status || '—')}</div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('LOAD SESSIONS ERROR:', err);
+        activeSessionsList.innerHTML = `<div class="error-state">${escapeHtml(err?.message || 'Error loading active sessions.')}</div>`;
+        sessionsHistoryList.innerHTML = `<div class="error-state">${escapeHtml(err?.message || 'Error loading session history.')}</div>`;
+      }
+    }
+
     addCustomerBtn.addEventListener('click', async () => {
       try {
-        const created = await createCustomer({
+        await createCustomer({
           name: '',
           address: '',
           email: '',
@@ -1850,7 +1985,6 @@
           saved: false
         });
 
-        console.log('CREATED CUSTOMER:', created);
         await loadCustomers(true);
       } catch (err) {
         console.error('ADD CUSTOMER ERROR:', err);
