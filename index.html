@@ -748,140 +748,22 @@
       font-size: 14px;
     }
 
-    /* ── Approve / Deny panel styles ── */
-    .ad-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .ad-card {
-      background: linear-gradient(180deg, #0d1324 0%, #0a1020 100%);
-      border: 1px solid #1a2744;
-      border-radius: 18px;
-      padding: 20px;
-      transition: border-color 0.3s, background 0.3s;
-    }
-
-    .ad-card.approved {
-      border-color: #1a5c38;
-      background: linear-gradient(180deg, #0a1e14 0%, #071510 100%);
-    }
-
-    .ad-card.denied {
-      border-color: #5c1a1a;
-      background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%);
-    }
-
-    .ad-card.blocked {
-      border-color: #5c1a1a;
-      background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%);
-    }
-
-    .ad-badge {
-      display: inline-block;
-      background: #182441;
-      color: #9cb3e7;
-      border: 1px solid #26395f;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-
-    .ad-btn-approve {
-      background: #15532e;
-      color: #6ee7a0;
-      border: 1px solid #1e7a41;
-      flex: 1;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .ad-btn-approve:hover { background: #1a6b39; }
-
-    .ad-btn-deny {
-      background: #4a1515;
-      color: #f87171;
-      border: 1px solid #7a1e1e;
-      flex: 1;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .ad-btn-deny:hover { background: #5c1a1a; }
-
-    .ad-btn-secondary {
-      background: #131c31;
-      color: #d5def3;
-      border: 1px solid #26395f;
-      flex: 1;
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .ad-btn-secondary:hover { background: #182441; }
-
-    .ad-btn-block {
-      background: #1a1010;
-      color: #f87171;
-      border: 1px solid #4a1515;
-      flex: 1;
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .ad-btn-block:hover { background: #291515; }
-
-    .ad-status-banner {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-top: 10px;
-    }
-
-    .ad-status-banner.show { display: flex; }
-    .ad-status-banner.approved { background: #0e3d22; color: #6ee7a0; border: 1px solid #1e7a41; }
-    .ad-status-banner.denied { background: #3d0e0e; color: #f87171; border: 1px solid #7a1e1e; }
-    .ad-status-banner.info { background: #0e2244; color: #93c5fd; border: 1px solid #1e3f7a; }
-
-    .ad-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .ad-dot-green { background: #22c55e; }
-    .ad-dot-red { background: #ef4444; }
-    .ad-dot-blue { background: #60a5fa; }
-
-    .ad-pending-count {
-      font-size: 34px;
-      font-weight: 700;
-      color: #edf3ff;
-      margin-bottom: 6px;
-    }
+    /* ── Copied from doc 3: approve/deny styles ── */
+    .visitor-card.approved { border-color: #1a5c38; background: linear-gradient(180deg, #0a1e14 0%, #071510 100%); }
+    .visitor-card.denied   { border-color: #5c1a1a; background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%); }
+    .btn-approve { background: #15532e; color: #6ee7a0; border: 1px solid #1e7a41; }
+    .btn-approve:hover { background: #1a6b39; }
+    .btn-deny { background: #4a1515; color: #f87171; border: 1px solid #7a1e1e; }
+    .btn-deny:hover { background: #5c1a1a; }
+    .btn-block { background: #1a1010; color: #f87171; border: 1px solid #4a1515; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
+    .btn-block:hover { background: #291515; }
+    .status-banner { display: none; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 10px; }
+    .status-banner.show { display: flex; }
+    .status-banner.approved { background: #0e3d22; color: #6ee7a0; border: 1px solid #1e7a41; }
+    .status-banner.denied   { background: #3d0e0e; color: #f87171; border: 1px solid #7a1e1e; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-approve { background: #22c55e; }
+    .dot-deny    { background: #ef4444; }
 
     @media (max-width: 900px) {
       .app-shell {
@@ -938,6 +820,7 @@
         <a class="nav-item active" data-page="dashboard" data-roles="admin,staff">Dashboard</a>
         <a class="nav-item" data-page="customers" data-roles="admin,staff">Customers</a>
         <a class="nav-item" data-page="messages" data-roles="admin">Messages</a>
+        <!-- Copied from doc 3 -->
         <a class="nav-item" data-page="approvals" data-roles="admin">Approve / Deny</a>
 
         <div class="nav-section" data-roles="admin">Management</div>
@@ -968,7 +851,6 @@
           </div>
         </div>
 
-        <!-- DASHBOARD PAGE -->
         <section id="page-dashboard" class="page active">
           <div class="title">Overview</div>
           <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
@@ -1060,7 +942,6 @@
           <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
         </section>
 
-        <!-- CUSTOMERS PAGE -->
         <section id="page-customers" class="page">
           <div class="title">Customers</div>
           <div class="subtitle">Admin can create cards. Staff can only view and mark them as edited.</div>
@@ -1072,7 +953,6 @@
           <div id="customers-list" class="customers-grid"></div>
         </section>
 
-        <!-- MESSAGES PAGE -->
         <section id="page-messages" class="page">
           <div class="title">Messages</div>
           <div class="subtitle">Orders loaded from your database.</div>
@@ -1082,35 +962,51 @@
           </div>
         </section>
 
-        <!-- APPROVE / DENY PAGE -->
+        <!-- ── Copied from doc 3: approve/deny page ── -->
         <section id="page-approvals" class="page">
           <div class="title">Approve / Deny</div>
           <div class="subtitle">Review incoming visitors and make access decisions.</div>
 
-          <div class="stats" style="margin-bottom:28px;">
+          <div class="stats">
+            <div class="stat-card">
+              <div class="stat-label">Total Requests</div>
+              <div class="stat-value">349</div>
+              <div class="stat-change">+18% this week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Today</div>
+              <div class="stat-value">117</div>
+              <div class="stat-change">+25.7% in last 24h</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Sessions</div>
+              <div class="stat-value">12</div>
+              <div class="stat-change">Live right now</div>
+            </div>
             <div class="stat-card">
               <div class="stat-label">Pending Review</div>
-              <div class="ad-pending-count" id="ad-pending">2</div>
+              <div class="stat-value" id="pending-count">2</div>
               <div class="stat-change" style="color:#f59e0b;">Awaiting decision</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Approved</div>
-              <div class="ad-pending-count" id="ad-approved-count">0</div>
-              <div class="stat-change">This session</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Denied</div>
-              <div class="ad-pending-count" id="ad-denied-count">0</div>
-              <div class="stat-change" style="color:#f87171;">This session</div>
             </div>
           </div>
 
-          <div class="ad-grid">
+          <div class="chart-box">
+            <div class="stat-label">Traffic Trend</div>
+            <div class="chart-line">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
+                  points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
+              </svg>
+            </div>
+          </div>
 
-            <!-- Visitor card 1 -->
-            <div class="ad-card" id="ad-card-1">
-              <div class="ad-badge">Just now</div>
+          <div class="section-title">Recent Visitors</div>
 
+          <div class="visitors">
+
+            <!-- Visitor 1 -->
+            <div class="visitor-card" id="card-1">
+              <div class="badge">Just now</div>
               <div class="row"><div class="label">Domain</div><div class="value">example.org</div></div>
               <div class="row"><div class="label">Location</div><div class="value">Shanghai, China</div></div>
               <div class="row"><div class="label">IP Address</div><div class="value">180.153.236.120</div></div>
@@ -1119,7 +1015,6 @@
 
               <div class="divider"></div>
               <div class="panel-title">Risk Signals</div>
-
               <div class="risk-row">
                 <span class="risk-label">Threat</span>
                 <div class="risk-bar-bg"><div class="risk-bar" style="width:72%; background:#ef4444;"></div></div>
@@ -1138,26 +1033,23 @@
 
               <div class="divider"></div>
               <div class="panel-title">Access Decision</div>
-
               <div class="verdict-row">
-                <button class="ad-btn-approve" onclick="adDecide(1,'approved')">Approve</button>
-                <button class="ad-btn-deny" onclick="adDecide(1,'denied')">Deny</button>
+                <button class="btn btn-approve" onclick="decide(1,'approved')">Approve</button>
+                <button class="btn btn-deny" onclick="decide(1,'denied')">Deny</button>
               </div>
               <div class="verdict-row">
-                <button class="ad-btn-secondary" onclick="adDecide(1,'detail')">View details</button>
-                <button class="ad-btn-block" onclick="adDecide(1,'block')">Block IP</button>
+                <button class="btn btn-detail" onclick="decide(1,'detail')">View details</button>
+                <button class="btn btn-block" onclick="decide(1,'block')">Block IP</button>
               </div>
-
-              <div class="ad-status-banner" id="ad-banner-1">
-                <div class="ad-dot" id="ad-dot-1"></div>
-                <span id="ad-text-1"></span>
+              <div class="status-banner" id="banner-1">
+                <div class="dot" id="dot-1"></div>
+                <span id="banner-text-1"></span>
               </div>
             </div>
 
-            <!-- Visitor card 2 -->
-            <div class="ad-card" id="ad-card-2">
-              <div class="ad-badge">2 minutes ago</div>
-
+            <!-- Visitor 2 -->
+            <div class="visitor-card" id="card-2">
+              <div class="badge">2 minutes ago</div>
               <div class="row"><div class="label">Domain</div><div class="value">mysite.app</div></div>
               <div class="row"><div class="label">Location</div><div class="value">Berlin, Germany</div></div>
               <div class="row"><div class="label">IP Address</div><div class="value">91.12.100.45</div></div>
@@ -1166,7 +1058,6 @@
 
               <div class="divider"></div>
               <div class="panel-title">Risk Signals</div>
-
               <div class="risk-row">
                 <span class="risk-label">Threat</span>
                 <div class="risk-bar-bg"><div class="risk-bar" style="width:8%; background:#22c55e;"></div></div>
@@ -1185,28 +1076,26 @@
 
               <div class="divider"></div>
               <div class="panel-title">Access Decision</div>
-
               <div class="verdict-row">
-                <button class="ad-btn-approve" onclick="adDecide(2,'approved')">Approve</button>
-                <button class="ad-btn-deny" onclick="adDecide(2,'denied')">Deny</button>
+                <button class="btn btn-approve" onclick="decide(2,'approved')">Approve</button>
+                <button class="btn btn-deny" onclick="decide(2,'denied')">Deny</button>
               </div>
               <div class="verdict-row">
-                <button class="ad-btn-secondary" onclick="adDecide(2,'detail')">View details</button>
-                <button class="ad-btn-block" onclick="adDecide(2,'block')">Block IP</button>
+                <button class="btn btn-detail" onclick="decide(2,'detail')">View details</button>
+                <button class="btn btn-block" onclick="decide(2,'block')">Block IP</button>
               </div>
-
-              <div class="ad-status-banner" id="ad-banner-2">
-                <div class="ad-dot" id="ad-dot-2"></div>
-                <span id="ad-text-2"></span>
+              <div class="status-banner" id="banner-2">
+                <div class="dot" id="dot-2"></div>
+                <span id="banner-text-2"></span>
               </div>
             </div>
 
           </div>
 
-          <div class="footer-note" style="margin-top:24px;">Connect to your backend to load real visitor data and persist decisions.</div>
+          <div class="footer-note">Demo layout only — connect it to your own backend or analytics source.</div>
         </section>
+        <!-- ── End approve/deny page ── -->
 
-        <!-- USERS PAGE -->
         <section id="page-users" class="page">
           <div class="title">Users</div>
           <div class="subtitle">Only admin can manage admin and staff accounts.</div>
@@ -2276,55 +2165,51 @@
       showLogin();
     }
 
-    /* ── Approve / Deny panel logic ── */
-    let adPending = 2;
-    let adApproved = 0;
-    let adDenied = 0;
-    const adDecided = new Set();
+    // ── Copied from doc 3: approve/deny logic ──
+    let pending = 2;
+    const decided = new Set();
 
-    function adDecide(id, action) {
-      const card = document.getElementById('ad-card-' + id);
-      const banner = document.getElementById('ad-banner-' + id);
-      const dot = document.getElementById('ad-dot-' + id);
-      const text = document.getElementById('ad-text-' + id);
+    function decide(id, action) {
+      const card = document.getElementById('card-' + id);
+      const banner = document.getElementById('banner-' + id);
+      const dot = document.getElementById('dot-' + id);
+      const text = document.getElementById('banner-text-' + id);
+
+      banner.className = 'status-banner show';
 
       if (action === 'approved') {
-        card.className = 'ad-card approved';
-        dot.className = 'ad-dot ad-dot-green';
+        card.className = 'visitor-card approved';
+        dot.className = 'dot dot-approve';
         text.textContent = 'Access approved — session allowed';
-        banner.className = 'ad-status-banner show approved';
-        adUpdateCounters(id, 'approved');
+        banner.className = 'status-banner show approved';
+        updatePending(id);
       } else if (action === 'denied') {
-        card.className = 'ad-card denied';
-        dot.className = 'ad-dot ad-dot-red';
+        card.className = 'visitor-card denied';
+        dot.className = 'dot dot-deny';
         text.textContent = 'Access denied — session blocked';
-        banner.className = 'ad-status-banner show denied';
-        adUpdateCounters(id, 'denied');
+        banner.className = 'status-banner show denied';
+        updatePending(id);
       } else if (action === 'block') {
-        card.className = 'ad-card blocked';
-        dot.className = 'ad-dot ad-dot-red';
+        card.className = 'visitor-card denied';
+        dot.className = 'dot dot-deny';
         text.textContent = 'IP address added to blocklist';
-        banner.className = 'ad-status-banner show denied';
-        adUpdateCounters(id, 'denied');
+        banner.className = 'status-banner show denied';
+        updatePending(id);
       } else if (action === 'detail') {
-        dot.className = 'ad-dot ad-dot-blue';
+        banner.className = 'status-banner show approved';
+        dot.className = 'dot dot-approve';
         text.textContent = 'Full session log opened in new tab';
-        banner.className = 'ad-status-banner show info';
       }
     }
 
-    function adUpdateCounters(id, outcome) {
-      if (adDecided.has(id)) return;
-      adDecided.add(id);
-
-      adPending = Math.max(0, adPending - 1);
-      if (outcome === 'approved') adApproved++;
-      if (outcome === 'denied') adDenied++;
-
-      document.getElementById('ad-pending').textContent = adPending;
-      document.getElementById('ad-approved-count').textContent = adApproved;
-      document.getElementById('ad-denied-count').textContent = adDenied;
+    function updatePending(id) {
+      if (!decided.has(id)) {
+        decided.add(id);
+        pending = Math.max(0, pending - 1);
+        document.getElementById('pending-count').textContent = pending;
+      }
     }
+    // ── End approve/deny logic ──
   </script>
 </body>
 </html>
