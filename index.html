@@ -601,7 +601,8 @@
     }
 
     .customer-name-input:focus,
-    .customer-input:focus {
+    .customer-input:focus,
+    .user-select:focus {
       border-color: #3b82f6;
       box-shadow: 0 0 0 3px rgba(59,130,246,0.14);
     }
@@ -645,7 +646,8 @@
       line-height: 1.45;
     }
 
-    .customer-card-actions {
+    .customer-card-actions,
+    .user-card-actions {
       display: flex;
       gap: 10px;
       margin-top: 16px;
@@ -655,7 +657,9 @@
     .customer-save-btn,
     .customer-delete-btn,
     .customer-copy-btn,
-    .customer-review-btn {
+    .customer-review-btn,
+    .user-save-btn,
+    .user-delete-btn {
       flex: 1;
       border: none;
       border-radius: 12px;
@@ -666,23 +670,29 @@
       min-width: 120px;
     }
 
-    .customer-save-btn {
+    .customer-save-btn,
+    .customer-review-btn,
+    .user-save-btn {
       background: #131c31;
       color: #d5def3;
       border: 1px solid #26395f;
     }
 
-    .customer-save-btn:hover {
+    .customer-save-btn:hover,
+    .customer-review-btn:hover:enabled,
+    .user-save-btn:hover {
       background: #182441;
     }
 
-    .customer-delete-btn {
+    .customer-delete-btn,
+    .user-delete-btn {
       background: #3a1212;
       color: #fca5a5;
       border: 1px solid #6b1f1f;
     }
 
-    .customer-delete-btn:hover {
+    .customer-delete-btn:hover,
+    .user-delete-btn:hover {
       background: #4a1515;
     }
 
@@ -694,16 +704,6 @@
 
     .customer-copy-btn:hover {
       background: #14304f;
-    }
-
-    .customer-review-btn {
-      background: #131c31;
-      color: #d5def3;
-      border: 1px solid #26395f;
-    }
-
-    .customer-review-btn:hover:enabled {
-      background: #182441;
     }
 
     .customer-review-btn:disabled {
@@ -723,6 +723,29 @@
 
     .customer-status.show {
       display: block;
+    }
+
+    .user-card {
+      background: linear-gradient(145deg, #0a1224, #070e1c);
+      border: 1px solid #1a2744;
+      border-radius: 18px;
+      padding: 20px;
+      transition: 0.2s ease;
+    }
+
+    .user-card:hover {
+      border-color: #2a3f69;
+    }
+
+    .user-select {
+      width: 100%;
+      border: 1px solid #26395f;
+      background: #0b1326;
+      color: #edf3ff;
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 14px;
     }
 
     @media (max-width: 900px) {
@@ -782,6 +805,7 @@
         <a class="nav-item" data-page="messages" data-roles="admin">Messages</a>
 
         <div class="nav-section" data-roles="admin">Management</div>
+        <a class="nav-item" data-page="users" data-roles="admin">Users</a>
         <a class="nav-item" data-page="reports" data-roles="admin">Reports</a>
         <a class="nav-item" data-page="sessions" data-roles="admin">Sessions</a>
         <a class="nav-item" data-page="domains" data-roles="admin">Domains</a>
@@ -919,6 +943,19 @@
           </div>
         </section>
 
+        <section id="page-users" class="page">
+          <div class="title">Users</div>
+          <div class="subtitle">Only admin can manage admin and staff accounts.</div>
+
+          <div class="message-wrapper">
+            <div class="customers-toolbar">
+              <button id="add-user-btn" class="add-customer-btn">+ Add User</button>
+            </div>
+
+            <div id="users-list" class="customers-grid"></div>
+          </div>
+        </section>
+
         <section id="page-reports" class="page">
           <div class="title">Reports</div>
           <div class="subtitle">Only visible for admin.</div>
@@ -966,6 +1003,7 @@
     const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
     const ORDERS_API = 'https://order-backend-one.vercel.app/api/orders';
     const CUSTOMERS_API = 'https://order-backend-one.vercel.app/api/customers';
+    const USERS_API = 'https://order-backend-one.vercel.app/api/users';
 
     let customersCache = [];
     let customersPollingInterval = null;
@@ -980,6 +1018,8 @@
     const logoutBtn = document.getElementById('logout-btn');
     const customersList = document.getElementById('customers-list');
     const addCustomerBtn = document.getElementById('add-customer-btn');
+    const usersList = document.getElementById('users-list');
+    const addUserBtn = document.getElementById('add-user-btn');
 
     const navItems = document.querySelectorAll('.nav-item');
     const pages = document.querySelectorAll('.page');
@@ -1044,6 +1084,10 @@
 
       if (pageName === 'customers') {
         loadCustomers(true);
+      }
+
+      if (pageName === 'users' && currentUser?.role === 'admin') {
+        loadUsers();
       }
     }
 
@@ -1281,14 +1325,20 @@
           throw new Error('Failed to load customers');
         }
 
-        const newHash = JSON.stringify(data);
+        const normalized = data.map(customer => ({
+          ...customer,
+          reviewedBy: customer.reviewedBy ?? customer.reviewed_by ?? '',
+          reviewedAt: customer.reviewedAt ?? customer.reviewed_at ?? ''
+        }));
+
+        const newHash = JSON.stringify(normalized);
 
         if (forceRender || newHash !== lastCustomersHash) {
           lastCustomersHash = newHash;
-          customersCache = data;
+          customersCache = normalized;
           rerenderCustomers();
         } else {
-          customersCache = data;
+          customersCache = normalized;
         }
       } catch (err) {
         console.error('LOAD CUSTOMERS ERROR:', err);
@@ -1316,12 +1366,26 @@
     }
 
     async function updateCustomer(customer) {
+      const payload = {
+        ...customer
+      };
+
+      if (payload.reviewedBy !== undefined) {
+        payload.reviewed_by = payload.reviewedBy;
+        delete payload.reviewedBy;
+      }
+
+      if (payload.reviewedAt !== undefined) {
+        payload.reviewed_at = payload.reviewedAt;
+        delete payload.reviewedAt;
+      }
+
       const res = await fetch(CUSTOMERS_API, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(customer)
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
@@ -1609,6 +1673,167 @@
       });
     }
 
+    async function loadUsers() {
+      if (!usersList || currentUser?.role !== 'admin') return;
+
+      try {
+        usersList.innerHTML = '<div class="loading">Loading users...</div>';
+
+        const res = await fetch(USERS_API);
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error(data?.error || 'Failed to load users');
+        }
+
+        if (data.length === 0) {
+          usersList.innerHTML = '<div class="empty-state">No users found.</div>';
+          return;
+        }
+
+        usersList.innerHTML = '';
+
+        data.forEach((user) => {
+          const card = document.createElement('div');
+          card.className = 'user-card';
+
+          card.innerHTML = `
+            <div class="customer-field">
+              <div class="customer-label">Username</div>
+              <input class="customer-input user-username" type="text" value="${escapeAttribute(user.username || '')}" />
+            </div>
+
+            <div class="customer-field">
+              <div class="customer-label">New Password</div>
+              <input class="customer-input user-password" type="text" placeholder="Leave empty to keep current password" value="" />
+            </div>
+
+            <div class="customer-field">
+              <div class="customer-label">Role</div>
+              <select class="user-select user-role">
+                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
+                <option value="staff" ${user.role === 'staff' ? 'selected' : ''}>staff</option>
+              </select>
+            </div>
+
+            <div class="customer-display-field">
+              <div class="customer-display-label">Created</div>
+              <div class="customer-display-value">${escapeHtml(formatDate(user.created_at))}</div>
+            </div>
+
+            <div class="user-card-actions">
+              <button class="user-save-btn" type="button">Save</button>
+              <button class="user-delete-btn" type="button">Delete</button>
+            </div>
+          `;
+
+          const usernameInput = card.querySelector('.user-username');
+          const passwordInput = card.querySelector('.user-password');
+          const roleSelect = card.querySelector('.user-role');
+          const saveBtn = card.querySelector('.user-save-btn');
+          const deleteBtn = card.querySelector('.user-delete-btn');
+
+          saveBtn.addEventListener('click', async () => {
+            try {
+              const res = await fetch(USERS_API, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  id: user.id,
+                  username: usernameInput.value.trim(),
+                  password: passwordInput.value.trim(),
+                  role: roleSelect.value
+                })
+              });
+
+              const result = await res.json();
+
+              if (!res.ok || !result.success) {
+                throw new Error(result?.error || 'Failed to update user');
+              }
+
+              await loadUsers();
+            } catch (err) {
+              console.error('UPDATE USER ERROR:', err);
+              alert('Update User Fehler: ' + (err?.message || err));
+            }
+          });
+
+          deleteBtn.addEventListener('click', async () => {
+            try {
+              const res = await fetch(USERS_API, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  id: user.id
+                })
+              });
+
+              const result = await res.json();
+
+              if (!res.ok || !result.success) {
+                throw new Error(result?.error || 'Failed to delete user');
+              }
+
+              await loadUsers();
+            } catch (err) {
+              console.error('DELETE USER ERROR:', err);
+              alert('Delete User Fehler: ' + (err?.message || err));
+            }
+          });
+
+          usersList.appendChild(card);
+        });
+      } catch (err) {
+        console.error('LOAD USERS ERROR:', err);
+        usersList.innerHTML = `<div class="error-state">${escapeHtml(err?.message || 'Error loading users.')}</div>`;
+      }
+    }
+
+    async function createUser() {
+      if (currentUser?.role !== 'admin') return;
+
+      const username = prompt('Enter username:');
+      if (!username) return;
+
+      const password = prompt('Enter password:');
+      if (!password) return;
+
+      const role = prompt('Enter role: admin or staff', 'staff');
+      if (!role) return;
+
+      const cleanRole = role.trim().toLowerCase();
+
+      if (!['admin', 'staff'].includes(cleanRole)) {
+        alert('Role must be admin or staff');
+        return;
+      }
+
+      const res = await fetch(USERS_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+          role: cleanRole
+        })
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result?.error || 'Failed to create user');
+      }
+
+      return result.user;
+    }
+
     addCustomerBtn.addEventListener('click', async () => {
       try {
         const created = await createCustomer({
@@ -1629,6 +1854,18 @@
         alert('Add Customer Fehler: ' + (err?.message || err));
       }
     });
+
+    if (addUserBtn) {
+      addUserBtn.addEventListener('click', async () => {
+        try {
+          await createUser();
+          await loadUsers();
+        } catch (err) {
+          console.error('ADD USER ERROR:', err);
+          alert('Add User Fehler: ' + (err?.message || err));
+        }
+      });
+    }
 
     const savedUser = getSession();
     if (savedUser && savedUser.username && savedUser.role) {
