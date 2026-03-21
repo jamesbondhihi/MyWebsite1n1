@@ -962,423 +962,568 @@
     </main>
   </div>
 
- <script>
-  const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
-  const ORDERS_API = 'https://order-backend-one.vercel.app/api/orders';
-  const CUSTOMERS_API = 'https://order-backend-one.vercel.app/api/customers';
+  <script>
+    const LOGIN_API = 'https://order-backend-one.vercel.app/api/login';
+    const ORDERS_API = 'https://order-backend-one.vercel.app/api/orders';
+    const CUSTOMERS_API = 'https://order-backend-one.vercel.app/api/customers';
 
-  let customersCache = [];
-  let customersPollingInterval = null;
-  let lastCustomersHash = '';
+    let customersCache = [];
+    let customersPollingInterval = null;
+    let lastCustomersHash = '';
 
-  const loginScreen = document.getElementById('login-screen');
-  const appShell = document.getElementById('app-shell');
-  const loginForm = document.getElementById('login-form');
-  const loginError = document.getElementById('login-error');
-  const currentUsernameEl = document.getElementById('current-username');
-  const currentRoleEl = document.getElementById('current-role');
-  const logoutBtn = document.getElementById('logout-btn');
-  const customersList = document.getElementById('customers-list');
-  const addCustomerBtn = document.getElementById('add-customer-btn');
+    const loginScreen = document.getElementById('login-screen');
+    const appShell = document.getElementById('app-shell');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const currentUsernameEl = document.getElementById('current-username');
+    const currentRoleEl = document.getElementById('current-role');
+    const logoutBtn = document.getElementById('logout-btn');
+    const customersList = document.getElementById('customers-list');
+    const addCustomerBtn = document.getElementById('add-customer-btn');
 
-  const navItems = document.querySelectorAll('.nav-item');
-  const pages = document.querySelectorAll('.page');
-  const roleElements = document.querySelectorAll('[data-roles]');
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+    const roleElements = document.querySelectorAll('[data-roles]');
 
-  let currentUser = null;
+    let currentUser = null;
 
-  function saveSession(user) {
-    localStorage.setItem('jaynex_user', JSON.stringify(user));
-  }
-
-  function getSession() {
-    try {
-      return JSON.parse(localStorage.getItem('jaynex_user'));
-    } catch {
-      return null;
+    function saveSession(user) {
+      localStorage.setItem('jaynex_user', JSON.stringify(user));
     }
-  }
 
-  function clearSession() {
-    localStorage.removeItem('jaynex_user');
-  }
-
-  function showLogin() {
-    loginScreen.classList.remove('hidden');
-    appShell.classList.add('hidden');
-  }
-
-  function showApp() {
-    loginScreen.classList.add('hidden');
-    appShell.classList.remove('hidden');
-  }
-
-  function applyRolePermissions(role) {
-    roleElements.forEach(el => {
-      const allowedRoles = (el.dataset.roles || '').split(',').map(r => r.trim());
-      if (allowedRoles.includes(role)) {
-        el.classList.remove('hidden');
-      } else {
-        el.classList.add('hidden');
+    function getSession() {
+      try {
+        return JSON.parse(localStorage.getItem('jaynex_user'));
+      } catch {
+        return null;
       }
+    }
+
+    function clearSession() {
+      localStorage.removeItem('jaynex_user');
+    }
+
+    function showLogin() {
+      loginScreen.classList.remove('hidden');
+      appShell.classList.add('hidden');
+    }
+
+    function showApp() {
+      loginScreen.classList.add('hidden');
+      appShell.classList.remove('hidden');
+    }
+
+    function applyRolePermissions(role) {
+      roleElements.forEach(el => {
+        const allowedRoles = (el.dataset.roles || '').split(',').map(r => r.trim());
+        if (allowedRoles.includes(role)) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+    }
+
+    function activatePage(pageName) {
+      const targetNav = Array.from(navItems).find(item =>
+        item.dataset.page === pageName && !item.classList.contains('hidden')
+      );
+      const targetPage = document.getElementById('page-' + pageName);
+
+      if (!targetNav || !targetPage) return;
+
+      navItems.forEach(nav => nav.classList.remove('active'));
+      pages.forEach(page => page.classList.remove('active'));
+
+      targetNav.classList.add('active');
+      targetPage.classList.add('active');
+
+      if (pageName === 'messages' && currentUser?.role === 'admin') {
+        loadMessages();
+      }
+
+      if (pageName === 'customers') {
+        loadCustomers(true);
+      }
+    }
+
+    async function login(username, password) {
+      try {
+        loginError.textContent = '';
+
+        const res = await fetch(LOGIN_API, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          loginError.textContent = data.error || 'Wrong login';
+          return;
+        }
+
+        currentUser = {
+          id: data.user.id,
+          username: data.user.username,
+          role: data.user.role
+        };
+
+        saveSession(currentUser);
+        await startUserSession();
+      } catch (err) {
+        console.error(err);
+        loginError.textContent = 'Server error';
+      }
+    }
+
+    async function startUserSession() {
+      if (!currentUser) return;
+
+      currentUsernameEl.textContent = currentUser.username;
+      currentRoleEl.textContent = currentUser.role === 'admin' ? 'ADMIN' : 'STAFF';
+
+      applyRolePermissions(currentUser.role);
+      showApp();
+
+      if (currentUser.role === 'staff') {
+        addCustomerBtn.classList.add('hidden');
+      } else {
+        addCustomerBtn.classList.remove('hidden');
+      }
+
+      await loadCustomers(true);
+      startCustomersLiveUpdates();
+      activatePage('dashboard');
+    }
+
+    function startCustomersLiveUpdates() {
+      stopCustomersLiveUpdates();
+
+      customersPollingInterval = setInterval(async () => {
+        if (!currentUser) return;
+
+        const customersPageActive = document.getElementById('page-customers')?.classList.contains('active');
+        if (!customersPageActive) return;
+
+        try {
+          await loadCustomers();
+        } catch (err) {
+          console.error('LIVE UPDATE ERROR:', err);
+        }
+      }, 2000);
+    }
+
+    function stopCustomersLiveUpdates() {
+      if (customersPollingInterval) {
+        clearInterval(customersPollingInterval);
+        customersPollingInterval = null;
+      }
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      await login(username, password);
     });
-  }
 
-  function activatePage(pageName) {
-    const targetNav = Array.from(navItems).find(item =>
-      item.dataset.page === pageName && !item.classList.contains('hidden')
-    );
-    const targetPage = document.getElementById('page-' + pageName);
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      clearSession();
+      stopCustomersLiveUpdates();
+      loginForm.reset();
+      showLogin();
+    });
 
-    if (!targetNav || !targetPage) return;
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (item.classList.contains('hidden')) return;
+        const page = item.dataset.page;
+        if (!page) return;
+        activatePage(page);
+      });
+    });
 
-    navItems.forEach(nav => nav.classList.remove('active'));
-    pages.forEach(page => page.classList.remove('active'));
+    async function loadMessages() {
+      const list = document.getElementById('messages-list');
+      if (!list) return;
 
-    targetNav.classList.add('active');
-    targetPage.classList.add('active');
+      try {
+        list.className = 'loading';
+        list.textContent = 'Loading messages...';
 
-    if (pageName === 'messages' && currentUser?.role === 'admin') {
-      loadMessages();
+        const res = await fetch(ORDERS_API);
+        if (!res.ok) {
+          throw new Error('API error: ' + res.status);
+        }
+
+        let orders = await res.json();
+
+        if (!Array.isArray(orders)) {
+          orders = [];
+        }
+
+        orders.sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA;
+        });
+
+        if (orders.length === 0) {
+          list.className = 'empty-state';
+          list.textContent = 'No messages found.';
+          return;
+        }
+
+        list.className = '';
+        list.innerHTML = orders.map(order => `
+          <div class="message-item">
+            <div class="message-top">
+              <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
+              <div class="message-time">${formatDate(order.created_at)}</div>
+            </div>
+
+            <div class="message-grid">
+              <div class="message-field">
+                <div class="label">Email</div>
+                <div class="value">${escapeHtml(order.email || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Phone</div>
+                <div class="value">${escapeHtml(order.phone || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Address</div>
+                <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Product</div>
+                <div class="value">${escapeHtml(order.product_name || '—')}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Quantity</div>
+                <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Price</div>
+                <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
+              </div>
+
+              <div class="message-field">
+                <div class="label">Order ID</div>
+                <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+        list.className = 'error-state';
+        list.textContent = 'Error loading messages.';
+      }
     }
 
-    if (pageName === 'customers') {
-      loadCustomers(true);
+    function formatDate(dateString) {
+      if (!dateString) return 'Unknown date';
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return 'Unknown date';
+      return date.toLocaleString();
     }
-  }
 
-  async function login(username, password) {
-    try {
-      loginError.textContent = '';
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
 
-      const res = await fetch(LOGIN_API, {
+    function escapeAttribute(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('"', '&quot;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+    }
+
+    function getCustomerCopyText(customer) {
+      return [
+        `Name: ${customer.name || ''}`,
+        `Address: ${customer.address || ''}`,
+        `Email: ${customer.email || ''}`,
+        `Phone: ${customer.phone || ''}`,
+        `Note: ${customer.note || ''}`,
+        `Status: ${customer.status || ''}`,
+        `Priority: ${customer.priority || ''}`,
+        `Reviewed: ${customer.reviewed ? 'Yes' : 'No'}`,
+        `Reviewed By: ${customer.reviewedBy || ''}`,
+        `Reviewed At: ${customer.reviewedAt ? formatDate(customer.reviewedAt) : ''}`
+      ].join('\n');
+    }
+
+    async function loadCustomers(forceRender = false) {
+      try {
+        const res = await fetch(CUSTOMERS_API);
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error('Failed to load customers');
+        }
+
+        const newHash = JSON.stringify(data);
+
+        if (forceRender || newHash !== lastCustomersHash) {
+          lastCustomersHash = newHash;
+          customersCache = data;
+          rerenderCustomers();
+        } else {
+          customersCache = data;
+        }
+      } catch (err) {
+        console.error('LOAD CUSTOMERS ERROR:', err);
+        customersCache = [];
+        rerenderCustomers();
+      }
+    }
+
+    async function createCustomer(customer) {
+      const res = await fetch(CUSTOMERS_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify(customer)
       });
 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        loginError.textContent = data.error || 'Wrong login';
-        return;
+        throw new Error(data.error || 'Failed to create customer');
       }
 
-      currentUser = {
-        id: data.user.id,
-        username: data.user.username,
-        role: data.user.role
-      };
-
-      saveSession(currentUser);
-      await startUserSession();
-    } catch (err) {
-      console.error(err);
-      loginError.textContent = 'Server error';
-    }
-  }
-
-  async function startUserSession() {
-    if (!currentUser) return;
-
-    currentUsernameEl.textContent = currentUser.username;
-    currentRoleEl.textContent = currentUser.role === 'admin' ? 'ADMIN' : 'STAFF';
-
-    applyRolePermissions(currentUser.role);
-    showApp();
-
-    if (currentUser.role === 'staff') {
-      addCustomerBtn.classList.add('hidden');
-    } else {
-      addCustomerBtn.classList.remove('hidden');
+      return data.customer;
     }
 
-    await loadCustomers(true);
-    startCustomersLiveUpdates();
-    activatePage('dashboard');
-  }
-
-  function startCustomersLiveUpdates() {
-    stopCustomersLiveUpdates();
-
-    customersPollingInterval = setInterval(async () => {
-      if (!currentUser) return;
-
-      const customersPageActive = document.getElementById('page-customers')?.classList.contains('active');
-      if (!customersPageActive) return;
-
-      try {
-        await loadCustomers();
-      } catch (err) {
-        console.error('LIVE UPDATE ERROR:', err);
-      }
-    }, 2000);
-  }
-
-  function stopCustomersLiveUpdates() {
-    if (customersPollingInterval) {
-      clearInterval(customersPollingInterval);
-      customersPollingInterval = null;
-    }
-  }
-
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    await login(username, password);
-  });
-
-  logoutBtn.addEventListener('click', () => {
-    currentUser = null;
-    clearSession();
-    stopCustomersLiveUpdates();
-    loginForm.reset();
-    showLogin();
-  });
-
-  navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (item.classList.contains('hidden')) return;
-      const page = item.dataset.page;
-      if (!page) return;
-      activatePage(page);
-    });
-  });
-
-  async function loadMessages() {
-    const list = document.getElementById('messages-list');
-    if (!list) return;
-
-    try {
-      list.className = 'loading';
-      list.textContent = 'Loading messages...';
-
-      const res = await fetch(ORDERS_API);
-      if (!res.ok) {
-        throw new Error('API error: ' + res.status);
-      }
-
-      let orders = await res.json();
-
-      if (!Array.isArray(orders)) {
-        orders = [];
-      }
-
-      orders.sort((a, b) => {
-        const dateA = new Date(a.created_at || 0).getTime();
-        const dateB = new Date(b.created_at || 0).getTime();
-        return dateB - dateA;
+    async function updateCustomer(customer) {
+      const res = await fetch(CUSTOMERS_API, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(customer)
       });
 
-      if (orders.length === 0) {
-        list.className = 'empty-state';
-        list.textContent = 'No messages found.';
-        return;
-      }
-
-      list.className = '';
-      list.innerHTML = orders.map(order => `
-        <div class="message-item">
-          <div class="message-top">
-            <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
-            <div class="message-time">${formatDate(order.created_at)}</div>
-          </div>
-
-          <div class="message-grid">
-            <div class="message-field">
-              <div class="label">Email</div>
-              <div class="value">${escapeHtml(order.email || '—')}</div>
-            </div>
-
-            <div class="message-field">
-              <div class="label">Phone</div>
-              <div class="value">${escapeHtml(order.phone || '—')}</div>
-            </div>
-
-            <div class="message-field">
-              <div class="label">Address</div>
-              <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
-            </div>
-
-            <div class="message-field">
-              <div class="label">Product</div>
-              <div class="value">${escapeHtml(order.product_name || '—')}</div>
-            </div>
-
-            <div class="message-field">
-              <div class="label">Quantity</div>
-              <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
-            </div>
-
-            <div class="message-field">
-              <div class="label">Price</div>
-              <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
-            </div>
-
-            <div class="message-field">
-              <div class="label">Order ID</div>
-              <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    } catch (err) {
-      console.error(err);
-      list.className = 'error-state';
-      list.textContent = 'Error loading messages.';
-    }
-  }
-
-  function formatDate(dateString) {
-    if (!dateString) return 'Unknown date';
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) return 'Unknown date';
-    return date.toLocaleString();
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
-
-  function escapeAttribute(str) {
-    return String(str)
-      .replaceAll('&', '&amp;')
-      .replaceAll('"', '&quot;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;');
-  }
-
-  function getCustomerCopyText(customer) {
-    return [
-      `Name: ${customer.name || ''}`,
-      `Address: ${customer.address || ''}`,
-      `Email: ${customer.email || ''}`,
-      `Phone: ${customer.phone || ''}`,
-      `Reviewed: ${customer.reviewed ? 'Yes' : 'No'}`,
-      `Reviewed By: ${customer.reviewedBy || ''}`,
-      `Reviewed At: ${customer.reviewedAt ? formatDate(customer.reviewedAt) : ''}`
-    ].join('\n');
-  }
-
-  async function loadCustomers(forceRender = false) {
-    try {
-      const res = await fetch(CUSTOMERS_API);
       const data = await res.json();
 
-      if (!res.ok || !Array.isArray(data)) {
-        throw new Error('Failed to load customers');
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update customer');
       }
 
-      const newHash = JSON.stringify(data);
+      return data.customer;
+    }
 
-      if (forceRender || newHash !== lastCustomersHash) {
-        lastCustomersHash = newHash;
-        customersCache = data;
-        rerenderCustomers();
-      } else {
-        customersCache = data;
+    async function deleteCustomer(id) {
+      const res = await fetch(CUSTOMERS_API, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete customer');
       }
-    } catch (err) {
-      console.error('LOAD CUSTOMERS ERROR:', err);
-      customersCache = [];
-      rerenderCustomers();
-    }
-  }
 
-  async function createCustomer(customer) {
-    const res = await fetch(CUSTOMERS_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(customer)
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to create customer');
+      return true;
     }
 
-    return data.customer;
-  }
+    async function copyCustomer(customer, button) {
+      const text = getCustomerCopyText(customer);
 
-  async function updateCustomer(customer) {
-    const res = await fetch(CUSTOMERS_API, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(customer)
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to update customer');
-    }
-
-    return data.customer;
-  }
-
-  async function deleteCustomer(id) {
-    const res = await fetch(CUSTOMERS_API, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to delete customer');
-    }
-
-    return true;
-  }
-
-  async function copyCustomer(customer, button) {
-    const text = getCustomerCopyText(customer);
-
-    try {
-      await navigator.clipboard.writeText(text);
-      if (button) {
-        const original = button.textContent;
-        button.textContent = 'Copied';
-        setTimeout(() => {
-          button.textContent = original;
-        }, 1200);
+      try {
+        await navigator.clipboard.writeText(text);
+        if (button) {
+          const original = button.textContent;
+          button.textContent = 'Copied';
+          setTimeout(() => {
+            button.textContent = original;
+          }, 1200);
+        }
+      } catch (err) {
+        console.error('COPY ERROR:', err);
       }
-    } catch (err) {
-      console.error('COPY ERROR:', err);
     }
-  }
 
-  function renderAdminCustomerCard(customer) {
-    const card = document.createElement('div');
-    card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
+    function renderAdminCustomerCard(customer) {
+      const card = document.createElement('div');
+      card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
 
-    const reviewedInfo = customer.reviewed
-      ? `
-        <div class="customer-status show">
-          Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}
-          ${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}
+      const reviewedInfo = customer.reviewed
+        ? `
+          <div class="customer-status show">
+            Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}
+            ${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}
+          </div>
+        `
+        : '';
+
+      if (customer.saved) {
+        card.innerHTML = `
+          <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Address</div>
+            <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Email</div>
+            <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Phone</div>
+            <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Note</div>
+            <div class="customer-display-value">${escapeHtml(customer.note || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Status</div>
+            <div class="customer-display-value">${escapeHtml(customer.status || '—')}</div>
+          </div>
+
+          <div class="customer-display-field">
+            <div class="customer-display-label">Priority</div>
+            <div class="customer-display-value">${escapeHtml(customer.priority || '—')}</div>
+          </div>
+
+          ${reviewedInfo}
+
+          <div class="customer-card-actions">
+            <button class="customer-delete-btn" type="button">Delete</button>
+            <button class="customer-copy-btn" type="button">Copy</button>
+          </div>
+        `;
+
+        card.querySelector('.customer-delete-btn').addEventListener('click', async () => {
+          try {
+            await deleteCustomer(customer.id);
+            await loadCustomers(true);
+          } catch (err) {
+            console.error(err);
+          }
+        });
+
+        card.querySelector('.customer-copy-btn').addEventListener('click', (e) => {
+          copyCustomer(customer, e.currentTarget);
+        });
+
+        return card;
+      }
+
+      card.innerHTML = `
+        <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeAttribute(customer.name || '')}" />
+
+        <div class="customer-field">
+          <div class="customer-label">Address</div>
+          <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" />
         </div>
-      `
-      : '';
 
-    if (customer.saved) {
+        <div class="customer-field">
+          <div class="customer-label">Email</div>
+          <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" />
+        </div>
+
+        <div class="customer-field">
+          <div class="customer-label">Phone</div>
+          <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" />
+        </div>
+
+        <div class="customer-field">
+          <div class="customer-label">Note</div>
+          <input class="customer-input customer-note" type="text" placeholder="Enter note" value="${escapeAttribute(customer.note || '')}" />
+        </div>
+
+        <div class="customer-field">
+          <div class="customer-label">Status</div>
+          <input class="customer-input customer-status-field" type="text" placeholder="Enter status" value="${escapeAttribute(customer.status || '')}" />
+        </div>
+
+        <div class="customer-field">
+          <div class="customer-label">Priority</div>
+          <input class="customer-input customer-priority" type="text" placeholder="Enter priority" value="${escapeAttribute(customer.priority || '')}" />
+        </div>
+
+        <div class="customer-card-actions">
+          <button class="customer-save-btn" type="button">Save</button>
+          <button class="customer-delete-btn" type="button">Delete</button>
+        </div>
+      `;
+
+      const nameInput = card.querySelector('.customer-name-input');
+      const addressInput = card.querySelector('.customer-address');
+      const emailInput = card.querySelector('.customer-email');
+      const phoneInput = card.querySelector('.customer-phone');
+      const noteInput = card.querySelector('.customer-note');
+      const statusInput = card.querySelector('.customer-status-field');
+      const priorityInput = card.querySelector('.customer-priority');
+      const saveBtn = card.querySelector('.customer-save-btn');
+      const deleteBtn = card.querySelector('.customer-delete-btn');
+
+      saveBtn.addEventListener('click', async () => {
+        try {
+          await updateCustomer({
+            id: customer.id,
+            name: nameInput.value.trim(),
+            address: addressInput.value.trim(),
+            email: emailInput.value.trim(),
+            phone: phoneInput.value.trim(),
+            note: noteInput.value.trim(),
+            status: statusInput.value.trim(),
+            priority: priorityInput.value.trim(),
+            saved: true
+          });
+
+          await loadCustomers(true);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      deleteBtn.addEventListener('click', async () => {
+        try {
+          await deleteCustomer(customer.id);
+          await loadCustomers(true);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      return card;
+    }
+
+    function renderStaffCustomerCard(customer) {
+      const card = document.createElement('div');
+      card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
+
       card.innerHTML = `
         <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
 
@@ -1397,189 +1542,101 @@
           <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
         </div>
 
-        ${reviewedInfo}
+        <div class="customer-display-field">
+          <div class="customer-display-label">Note</div>
+          <div class="customer-display-value">${escapeHtml(customer.note || '—')}</div>
+        </div>
+
+        <div class="customer-display-field">
+          <div class="customer-display-label">Status</div>
+          <div class="customer-display-value">${escapeHtml(customer.status || '—')}</div>
+        </div>
+
+        <div class="customer-display-field">
+          <div class="customer-display-label">Priority</div>
+          <div class="customer-display-value">${escapeHtml(customer.priority || '—')}</div>
+        </div>
 
         <div class="customer-card-actions">
-          <button class="customer-delete-btn" type="button">Delete</button>
+          <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>
+            ${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}
+          </button>
           <button class="customer-copy-btn" type="button">Copy</button>
+        </div>
+
+        <div class="customer-status ${customer.reviewed ? 'show' : ''}">
+          ${customer.reviewed
+            ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}`
+            : 'Bearbeitet'}
         </div>
       `;
 
-      card.querySelector('.customer-delete-btn').addEventListener('click', async () => {
+      const reviewBtn = card.querySelector('.customer-review-btn');
+      const copyBtn = card.querySelector('.customer-copy-btn');
+
+      reviewBtn.addEventListener('click', async () => {
         try {
-          await deleteCustomer(customer.id);
+          await updateCustomer({
+            id: customer.id,
+            reviewed: true,
+            reviewedBy: currentUser?.username || 'staff'
+          });
+
           await loadCustomers(true);
         } catch (err) {
           console.error(err);
         }
       });
 
-      card.querySelector('.customer-copy-btn').addEventListener('click', (e) => {
+      copyBtn.addEventListener('click', (e) => {
         copyCustomer(customer, e.currentTarget);
       });
 
       return card;
     }
 
-    card.innerHTML = `
-      <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeAttribute(customer.name || '')}" />
+    function rerenderCustomers() {
+      if (!customersList) return;
 
-      <div class="customer-field">
-        <div class="customer-label">Address</div>
-        <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" />
-      </div>
+      customersList.innerHTML = '';
 
-      <div class="customer-field">
-        <div class="customer-label">Email</div>
-        <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" />
-      </div>
+      customersCache.forEach((customer) => {
+        const card = currentUser?.role === 'admin'
+          ? renderAdminCustomerCard(customer)
+          : renderStaffCustomerCard(customer);
 
-      <div class="customer-field">
-        <div class="customer-label">Phone</div>
-        <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" />
-      </div>
-
-      <div class="customer-card-actions">
-        <button class="customer-save-btn" type="button">Save</button>
-        <button class="customer-delete-btn" type="button">Delete</button>
-      </div>
-    `;
-
-    const nameInput = card.querySelector('.customer-name-input');
-    const addressInput = card.querySelector('.customer-address');
-    const emailInput = card.querySelector('.customer-email');
-    const phoneInput = card.querySelector('.customer-phone');
-    const saveBtn = card.querySelector('.customer-save-btn');
-    const deleteBtn = card.querySelector('.customer-delete-btn');
-
-    saveBtn.addEventListener('click', async () => {
-      try {
-        await updateCustomer({
-          id: customer.id,
-          name: nameInput.value.trim(),
-          address: addressInput.value.trim(),
-          email: emailInput.value.trim(),
-          phone: phoneInput.value.trim(),
-          saved: true
-        });
-
-        await loadCustomers(true);
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    deleteBtn.addEventListener('click', async () => {
-      try {
-        await deleteCustomer(customer.id);
-        await loadCustomers(true);
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    return card;
-  }
-
-  function renderStaffCustomerCard(customer) {
-    const card = document.createElement('div');
-    card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
-
-    card.innerHTML = `
-      <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
-
-      <div class="customer-display-field">
-        <div class="customer-display-label">Address</div>
-        <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
-      </div>
-
-      <div class="customer-display-field">
-        <div class="customer-display-label">Email</div>
-        <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
-      </div>
-
-      <div class="customer-display-field">
-        <div class="customer-display-label">Phone</div>
-        <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
-      </div>
-
-      <div class="customer-card-actions">
-        <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>
-          ${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}
-        </button>
-        <button class="customer-copy-btn" type="button">Copy</button>
-      </div>
-
-      <div class="customer-status ${customer.reviewed ? 'show' : ''}">
-        ${customer.reviewed
-          ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}`
-          : 'Bearbeitet'}
-      </div>
-    `;
-
-    const reviewBtn = card.querySelector('.customer-review-btn');
-    const copyBtn = card.querySelector('.customer-copy-btn');
-
-    reviewBtn.addEventListener('click', async () => {
-      try {
-        await updateCustomer({
-          id: customer.id,
-          reviewed: true,
-          reviewedBy: currentUser?.username || 'staff'
-        });
-
-        await loadCustomers(true);
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    copyBtn.addEventListener('click', (e) => {
-      copyCustomer(customer, e.currentTarget);
-    });
-
-    return card;
-  }
-
-  function rerenderCustomers() {
-    if (!customersList) return;
-
-    customersList.innerHTML = '';
-
-    customersCache.forEach((customer) => {
-      const card = currentUser?.role === 'admin'
-        ? renderAdminCustomerCard(customer)
-        : renderStaffCustomerCard(customer);
-
-      customersList.appendChild(card);
-    });
-  }
-
-  addCustomerBtn.addEventListener('click', async () => {
-    try {
-      const created = await createCustomer({
-        name: '',
-        address: '',
-        email: '',
-        phone: '',
-        saved: false
+        customersList.appendChild(card);
       });
-
-      console.log('CREATED CUSTOMER:', created);
-      await loadCustomers(true);
-    } catch (err) {
-      console.error('ADD CUSTOMER ERROR:', err);
-      alert('Add Customer Fehler: ' + (err?.message || err));
     }
-  });
 
-  const savedUser = getSession();
-  if (savedUser && savedUser.username && savedUser.role) {
-    currentUser = savedUser;
-    startUserSession().catch(console.error);
-  } else {
-    showLogin();
-  }
-</script>
+    addCustomerBtn.addEventListener('click', async () => {
+      try {
+        const created = await createCustomer({
+          name: '',
+          address: '',
+          email: '',
+          phone: '',
+          note: '',
+          status: '',
+          priority: '',
+          saved: false
+        });
+
+        console.log('CREATED CUSTOMER:', created);
+        await loadCustomers(true);
+      } catch (err) {
+        console.error('ADD CUSTOMER ERROR:', err);
+        alert('Add Customer Fehler: ' + (err?.message || err));
+      }
+    });
+
+    const savedUser = getSession();
+    if (savedUser && savedUser.username && savedUser.role) {
+      currentUser = savedUser;
+      startUserSession().catch(console.error);
+    } else {
+      showLogin();
+    }
+  </script>
 </body>
 </html>
