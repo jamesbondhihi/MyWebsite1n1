@@ -819,42 +819,103 @@
     }
 
     async function loadSessions() {
-      if (currentUser?.role !== 'admin') return;
-      if (!activeSessionsList || !sessionsHistoryList) return;
-      try {
-        activeSessionsList.innerHTML = '<div class="loading">Loading active sessions...</div>';
-        sessionsHistoryList.innerHTML = '<div class="loading">Loading session history...</div>';
-        const res = await fetch(SESSIONS_API, { headers: getAuthHeaders() });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data?.error || 'Failed to load sessions');
-        const active = Array.isArray(data.active) ? data.active : [];
-        const history = Array.isArray(data.history) ? data.history : [];
-        activeSessionsList.innerHTML = active.length === 0 ? '<div class="empty-state">No active users right now.</div>' : active.map(s => `
-          <div class="message-item">
-            <div class="message-top"><div class="message-name">${escapeHtml(s.username)}</div><div class="message-time">${formatDate(s.login_at)}</div></div>
-            <div class="message-grid">
-              <div class="message-field"><div class="label">Role</div><div class="value">${escapeHtml(s.role||'—')}</div></div>
-              <div class="message-field"><div class="label">Login At</div><div class="value">${escapeHtml(formatDate(s.login_at))}</div></div>
-              <div class="message-field"><div class="label">Status</div><div class="value">Online</div></div>
-            </div>
-          </div>`).join('');
-        sessionsHistoryList.innerHTML = history.length === 0 ? '<div class="empty-state">No session history found.</div>' : history.map(s => `
-          <div class="message-item">
-            <div class="message-top"><div class="message-name">${escapeHtml(s.username)}</div><div class="message-time">${formatDate(s.login_at)}</div></div>
-            <div class="message-grid">
-              <div class="message-field"><div class="label">Role</div><div class="value">${escapeHtml(s.role||'—')}</div></div>
-              <div class="message-field"><div class="label">Login At</div><div class="value">${escapeHtml(formatDate(s.login_at))}</div></div>
-              <div class="message-field"><div class="label">Logout At</div><div class="value">${escapeHtml(s.logout_at?formatDate(s.logout_at):'Still online')}</div></div>
-              <div class="message-field"><div class="label">Duration</div><div class="value">${escapeHtml(formatDuration(s.duration_seconds))}</div></div>
-              <div class="message-field"><div class="label">Status</div><div class="value">${escapeHtml(s.session_status||'—')}</div></div>
-            </div>
-          </div>`).join('');
-      } catch (err) {
-        console.error('LOAD SESSIONS ERROR:', err);
-        activeSessionsList.innerHTML = `<div class="error-state">${escapeHtml(err?.message||'Error loading active sessions.')}</div>`;
-        sessionsHistoryList.innerHTML = `<div class="error-state">${escapeHtml(err?.message||'Error loading session history.')}</div>`;
-      }
+  if (currentUser?.role !== 'admin') return;
+  if (!activeSessionsList || !sessionsHistoryList) return;
+
+  try {
+    activeSessionsList.innerHTML = '';
+    sessionsHistoryList.innerHTML = '';
+
+    activeSessionsList.innerHTML = '<div class="loading">Loading active sessions...</div>';
+    sessionsHistoryList.innerHTML = '<div class="loading">Loading session history...</div>';
+
+    const res = await fetch(SESSIONS_API, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      cache: 'no-store'
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data?.error || 'Failed to load sessions');
     }
+
+    const active = Array.isArray(data.active) ? data.active : [];
+    const history = Array.isArray(data.history) ? data.history : [];
+
+    activeSessionsList.innerHTML = '';
+    sessionsHistoryList.innerHTML = '';
+
+    if (active.length === 0) {
+      activeSessionsList.innerHTML = '<div class="empty-state">No active users right now.</div>';
+    } else {
+      activeSessionsList.innerHTML = active.map(session => `
+        <div class="message-item">
+          <div class="message-top">
+            <div class="message-name">${escapeHtml(session.username || 'Unknown')}</div>
+            <div class="message-time">${formatDate(session.login_at)}</div>
+          </div>
+
+          <div class="message-grid">
+            <div class="message-field">
+              <div class="label">Role</div>
+              <div class="value">${escapeHtml(session.role || '—')}</div>
+            </div>
+            <div class="message-field">
+              <div class="label">Login At</div>
+              <div class="value">${escapeHtml(formatDate(session.login_at))}</div>
+            </div>
+            <div class="message-field">
+              <div class="label">Status</div>
+              <div class="value">${escapeHtml(session.session_status || 'Online')}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (history.length === 0) {
+      sessionsHistoryList.innerHTML = '<div class="empty-state">No session history found.</div>';
+    } else {
+      sessionsHistoryList.innerHTML = history.map(session => `
+        <div class="message-item">
+          <div class="message-top">
+            <div class="message-name">${escapeHtml(session.username || 'Unknown')}</div>
+            <div class="message-time">${formatDate(session.login_at)}</div>
+          </div>
+
+          <div class="message-grid">
+            <div class="message-field">
+              <div class="label">Role</div>
+              <div class="value">${escapeHtml(session.role || '—')}</div>
+            </div>
+            <div class="message-field">
+              <div class="label">Login At</div>
+              <div class="value">${escapeHtml(formatDate(session.login_at))}</div>
+            </div>
+            <div class="message-field">
+              <div class="label">Logout At</div>
+              <div class="value">${escapeHtml(session.logout_at ? formatDate(session.logout_at) : 'Still online')}</div>
+            </div>
+            <div class="message-field">
+              <div class="label">Duration</div>
+              <div class="value">${escapeHtml(formatDuration(session.duration_seconds || 0))}</div>
+            </div>
+            <div class="message-field">
+              <div class="label">Status</div>
+              <div class="value">${escapeHtml(session.session_status || '—')}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('LOAD SESSIONS ERROR:', err);
+    activeSessionsList.innerHTML = `<div class="error-state">${escapeHtml(err?.message || 'Error loading active sessions.')}</div>`;
+    sessionsHistoryList.innerHTML = `<div class="error-state">${escapeHtml(err?.message || 'Error loading session history.')}</div>`;
+  }
+}
 
     addCustomerBtn.addEventListener('click', async () => {
       try { await createCustomer({ name:'', address:'', email:'', phone:'', note:'', status:'', priority:'', saved:false }); await loadCustomers(true); }
