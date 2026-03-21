@@ -1043,6 +1043,13 @@
       localStorage.removeItem('jaynex_user');
     }
 
+    function getAuthHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'x-user': JSON.stringify(currentUser || {})
+  };
+}
+
     function showLogin() {
       loginScreen.classList.remove('hidden');
       appShell.classList.add('hidden');
@@ -1365,28 +1372,37 @@
       return data.customer;
     }
 
-    async function updateCustomer(customer) {
-      const payload = {
-        ...customer
-      };
+   async function updateCustomer(customer) {
+  const payload = {
+    ...customer
+  };
 
-      if (payload.reviewedBy !== undefined) {
-        payload.reviewed_by = payload.reviewedBy;
-        delete payload.reviewedBy;
-      }
+  if (payload.reviewedBy !== undefined) {
+    payload.reviewed_by = payload.reviewedBy;
+    delete payload.reviewedBy;
+  }
 
-      if (payload.reviewedAt !== undefined) {
-        payload.reviewed_at = payload.reviewedAt;
-        delete payload.reviewedAt;
-      }
+  if (payload.reviewedAt !== undefined) {
+    payload.reviewed_at = payload.reviewedAt;
+    delete payload.reviewedAt;
+  }
 
-      const res = await fetch(CUSTOMERS_API, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+  const res = await fetch(CUSTOMERS_API, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to update customer');
+  }
+
+  return data.customer;
+}
 
       const data = await res.json();
 
@@ -1679,7 +1695,9 @@
       try {
         usersList.innerHTML = '<div class="loading">Loading users...</div>';
 
-        const res = await fetch(USERS_API);
+        const res = await fetch(USERS_API, {
+  headers: getAuthHeaders()
+});
         const data = await res.json();
 
         if (!res.ok || !Array.isArray(data)) {
@@ -1736,17 +1754,15 @@
           saveBtn.addEventListener('click', async () => {
             try {
               const res = await fetch(USERS_API, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  id: user.id,
-                  username: usernameInput.value.trim(),
-                  password: passwordInput.value.trim(),
-                  role: roleSelect.value
-                })
-              });
+  method: 'PUT',
+  headers: getAuthHeaders(),
+  body: JSON.stringify({
+    id: user.id,
+    username: usernameInput.value.trim(),
+    password: passwordInput.value.trim(),
+    role: roleSelect.value
+  })
+});
 
               const result = await res.json();
 
@@ -1764,14 +1780,12 @@
           deleteBtn.addEventListener('click', async () => {
             try {
               const res = await fetch(USERS_API, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  id: user.id
-                })
-              });
+  method: 'DELETE',
+  headers: getAuthHeaders(),
+  body: JSON.stringify({
+    id: user.id
+  })
+});
 
               const result = await res.json();
 
@@ -1814,16 +1828,14 @@
       }
 
       const res = await fetch(USERS_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          password,
-          role: cleanRole
-        })
-      });
+  method: 'POST',
+  headers: getAuthHeaders(),
+  body: JSON.stringify({
+    username: username.trim(),
+    password,
+    role: cleanRole
+  })
+});
 
       const result = await res.json();
 
