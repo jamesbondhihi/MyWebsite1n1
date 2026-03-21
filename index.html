@@ -244,7 +244,11 @@
 
     .visitor-card {
       padding: 18px;
+      transition: border-color 0.3s, background 0.3s;
     }
+
+    .visitor-card.approved { border-color: #1a5c38; background: linear-gradient(180deg, #0a1e14 0%, #071510 100%); }
+    .visitor-card.denied   { border-color: #5c1a1a; background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%); }
 
     .badge {
       display: inline-block;
@@ -316,9 +320,23 @@
       padding: 9px 12px;
     }
 
-    .btn-detail:hover {
-      background: #182441;
-    }
+    .btn-detail:hover { background: #182441; }
+
+    .btn-approve { background: #15532e; color: #6ee7a0; border: 1px solid #1e7a41; }
+    .btn-approve:hover { background: #1a6b39; }
+    .btn-deny { background: #4a1515; color: #f87171; border: 1px solid #7a1e1e; }
+    .btn-deny:hover { background: #5c1a1a; }
+    .btn-block { background: #1a1010; color: #f87171; border: 1px solid #4a1515; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
+    .btn-block:hover { background: #291515; }
+
+    .status-banner { display: none; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 10px; }
+    .status-banner.show { display: flex; }
+    .status-banner.approved { background: #0e3d22; color: #6ee7a0; border: 1px solid #1e7a41; }
+    .status-banner.denied   { background: #3d0e0e; color: #f87171; border: 1px solid #7a1e1e; }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-approve { background: #22c55e; }
+    .dot-deny    { background: #ef4444; }
 
     .risk-row {
       display: flex;
@@ -748,42 +766,11 @@
       font-size: 14px;
     }
 
-    /* ── Copied from doc 3: approve/deny styles ── */
-    .visitor-card.approved { border-color: #1a5c38; background: linear-gradient(180deg, #0a1e14 0%, #071510 100%); }
-    .visitor-card.denied   { border-color: #5c1a1a; background: linear-gradient(180deg, #1e0a0a 0%, #150707 100%); }
-    .btn-approve { background: #15532e; color: #6ee7a0; border: 1px solid #1e7a41; }
-    .btn-approve:hover { background: #1a6b39; }
-    .btn-deny { background: #4a1515; color: #f87171; border: 1px solid #7a1e1e; }
-    .btn-deny:hover { background: #5c1a1a; }
-    .btn-block { background: #1a1010; color: #f87171; border: 1px solid #4a1515; font-size: 12px; border-radius: 10px; padding: 9px 12px; }
-    .btn-block:hover { background: #291515; }
-    .status-banner { display: none; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 10px; }
-    .status-banner.show { display: flex; }
-    .status-banner.approved { background: #0e3d22; color: #6ee7a0; border: 1px solid #1e7a41; }
-    .status-banner.denied   { background: #3d0e0e; color: #f87171; border: 1px solid #7a1e1e; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-approve { background: #22c55e; }
-    .dot-deny    { background: #ef4444; }
-
     @media (max-width: 900px) {
-      .app-shell {
-        flex-direction: column;
-      }
-
-      .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #16213b;
-      }
-
-      .main-content {
-        padding: 18px;
-      }
-
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .app-shell { flex-direction: column; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #16213b; }
+      .main-content { padding: 18px; }
+      .topbar { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -792,18 +779,15 @@
     <div class="login-card">
       <div class="login-title">JAYNEX Login</div>
       <div class="login-subtitle">Sign in to access your dashboard</div>
-
       <form id="login-form">
         <div class="login-group">
           <label class="login-label" for="username">Username</label>
           <input class="login-input" id="username" type="text" placeholder="Enter username" required />
         </div>
-
         <div class="login-group">
           <label class="login-label" for="password">Password</label>
           <input class="login-input" id="password" type="password" placeholder="Enter password" required />
         </div>
-
         <button class="login-btn" type="submit">Login</button>
         <div id="login-error" class="login-error"></div>
       </form>
@@ -814,14 +798,11 @@
     <aside class="sidebar">
       <div class="brand">JAYNEX</div>
       <div class="brand-sub">LIVE</div>
-
       <nav class="nav">
         <div class="nav-section">Main</div>
         <a class="nav-item active" data-page="dashboard" data-roles="admin,staff">Dashboard</a>
         <a class="nav-item" data-page="customers" data-roles="admin,staff">Customers</a>
         <a class="nav-item" data-page="messages" data-roles="admin">Messages</a>
-        <!-- Copied from doc 3 -->
-        <a class="nav-item" data-page="approvals" data-roles="admin">Approve / Deny</a>
 
         <div class="nav-section" data-roles="admin">Management</div>
         <a class="nav-item" data-page="users" data-roles="admin">Users</a>
@@ -851,6 +832,7 @@
           </div>
         </div>
 
+        <!-- DASHBOARD -->
         <section id="page-dashboard" class="page active">
           <div class="title">Overview</div>
           <div class="subtitle">Monitor traffic, requests, and recent website activity.</div>
@@ -888,7 +870,6 @@
           </div>
 
           <div class="section-title">Recent Activity</div>
-
           <div class="visitors">
             <div class="visitor-card">
               <div class="badge">Just now</div>
@@ -939,33 +920,8 @@
             </div>
           </div>
 
-          <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
-        </section>
-
-        <section id="page-customers" class="page">
-          <div class="title">Customers</div>
-          <div class="subtitle">Admin can create cards. Staff can only view and mark them as edited.</div>
-
-          <div class="customers-toolbar">
-            <button id="add-customer-btn" class="add-customer-btn">+ Add Customer</button>
-          </div>
-
-          <div id="customers-list" class="customers-grid"></div>
-        </section>
-
-        <section id="page-messages" class="page">
-          <div class="title">Messages</div>
-          <div class="subtitle">Orders loaded from your database.</div>
-
-          <div class="message-wrapper">
-            <div id="messages-list" style="color:#b8c7ea;">Loading messages...</div>
-          </div>
-        </section>
-
-        <!-- ── Copied from doc 3: approve/deny page ── -->
-        <section id="page-approvals" class="page">
-          <div class="title">Approve / Deny</div>
-          <div class="subtitle">Review incoming visitors and make access decisions.</div>
+          <!-- APPROVE / DENY directly on dashboard -->
+          <div class="section-title" style="margin-top:36px;">Approve / Deny</div>
 
           <div class="stats">
             <div class="stat-card">
@@ -990,18 +946,6 @@
             </div>
           </div>
 
-          <div class="chart-box">
-            <div class="stat-label">Traffic Trend</div>
-            <div class="chart-line">
-              <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-                <polyline fill="none" stroke="#46c2ff" stroke-width="1.5"
-                  points="0,25 10,22 20,10 30,14 40,20 50,18 60,19 70,15 80,13 90,16 100,11"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="section-title">Recent Visitors</div>
-
           <div class="visitors">
 
             <!-- Visitor 1 -->
@@ -1012,7 +956,6 @@
               <div class="row"><div class="label">IP Address</div><div class="value">180.153.236.120</div></div>
               <div class="row"><div class="label">Browser</div><div class="value">Edge on Windows</div></div>
               <div class="row"><div class="label">Current Page</div><div class="value">/pricing</div></div>
-
               <div class="divider"></div>
               <div class="panel-title">Risk Signals</div>
               <div class="risk-row">
@@ -1030,7 +973,6 @@
                 <div class="risk-bar-bg"><div class="risk-bar" style="width:90%; background:#ef4444;"></div></div>
                 <span class="risk-val" style="color:#f87171;">90%</span>
               </div>
-
               <div class="divider"></div>
               <div class="panel-title">Access Decision</div>
               <div class="verdict-row">
@@ -1055,7 +997,6 @@
               <div class="row"><div class="label">IP Address</div><div class="value">91.12.100.45</div></div>
               <div class="row"><div class="label">Browser</div><div class="value">Chrome on macOS</div></div>
               <div class="row"><div class="label">Current Page</div><div class="value">/contact</div></div>
-
               <div class="divider"></div>
               <div class="panel-title">Risk Signals</div>
               <div class="risk-row">
@@ -1073,7 +1014,6 @@
                 <div class="risk-bar-bg"><div class="risk-bar" style="width:5%; background:#22c55e;"></div></div>
                 <span class="risk-val" style="color:#6ee7a0;">5%</span>
               </div>
-
               <div class="divider"></div>
               <div class="panel-title">Access Decision</div>
               <div class="verdict-row">
@@ -1092,28 +1032,43 @@
 
           </div>
 
-          <div class="footer-note">Demo layout only — connect it to your own backend or analytics source.</div>
+          <div class="footer-note">Demo layout only — connect it to your own analytics or admin backend.</div>
         </section>
-        <!-- ── End approve/deny page ── -->
 
+        <!-- CUSTOMERS -->
+        <section id="page-customers" class="page">
+          <div class="title">Customers</div>
+          <div class="subtitle">Admin can create cards. Staff can only view and mark them as edited.</div>
+          <div class="customers-toolbar">
+            <button id="add-customer-btn" class="add-customer-btn">+ Add Customer</button>
+          </div>
+          <div id="customers-list" class="customers-grid"></div>
+        </section>
+
+        <!-- MESSAGES -->
+        <section id="page-messages" class="page">
+          <div class="title">Messages</div>
+          <div class="subtitle">Orders loaded from your database.</div>
+          <div class="message-wrapper">
+            <div id="messages-list" style="color:#b8c7ea;">Loading messages...</div>
+          </div>
+        </section>
+
+        <!-- USERS -->
         <section id="page-users" class="page">
           <div class="title">Users</div>
           <div class="subtitle">Only admin can manage admin and staff accounts.</div>
-
           <div class="message-wrapper" style="margin-bottom:20px;">
             <div class="customers-toolbar">
               <button id="add-user-btn" class="add-customer-btn">+ Add User</button>
             </div>
-
             <div id="users-list" class="customers-grid"></div>
           </div>
-
           <div class="message-wrapper" style="margin-bottom:20px;">
             <div class="title" style="font-size:22px; margin-bottom:8px;">Currently Logged In</div>
             <div class="subtitle" style="margin-bottom:16px;">Only admins can see who is online right now.</div>
             <div id="active-sessions-list"></div>
           </div>
-
           <div class="message-wrapper" style="margin-bottom:20px;">
             <div class="title" style="font-size:22px; margin-bottom:8px;">Timestamp</div>
             <div class="subtitle" style="margin-bottom:16px;">Login time, logout time and session duration.</div>
@@ -1121,45 +1076,14 @@
           </div>
         </section>
 
-        <section id="page-reports" class="page">
-          <div class="title">Reports</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-sessions" class="page">
-          <div class="title">Sessions</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-domains" class="page">
-          <div class="title">Domains</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-integrations" class="page">
-          <div class="title">Integrations</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-settings" class="page">
-          <div class="title">Settings</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-billing" class="page">
-          <div class="title">Billing</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-logs" class="page">
-          <div class="title">Logs</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
-
-        <section id="page-support" class="page">
-          <div class="title">Support</div>
-          <div class="subtitle">Only visible for admin.</div>
-        </section>
+        <section id="page-reports" class="page"><div class="title">Reports</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-sessions" class="page"><div class="title">Sessions</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-domains" class="page"><div class="title">Domains</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-integrations" class="page"><div class="title">Integrations</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-settings" class="page"><div class="title">Settings</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-billing" class="page"><div class="title">Billing</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-logs" class="page"><div class="title">Logs</div><div class="subtitle">Only visible for admin.</div></section>
+        <section id="page-support" class="page"><div class="title">Support</div><div class="subtitle">Only visible for admin.</div></section>
       </div>
     </main>
   </div>
@@ -1274,9 +1198,7 @@
 
         const res = await fetch(LOGIN_API, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
 
@@ -1359,12 +1281,8 @@
         if (currentUser?.sessionId) {
           await fetch(LOGOUT_API, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              sessionId: currentUser.sessionId
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: currentUser.sessionId })
           });
         }
       } catch (err) {
@@ -1397,21 +1315,12 @@
         list.textContent = 'Loading messages...';
 
         const res = await fetch(ORDERS_API);
-        if (!res.ok) {
-          throw new Error('API error: ' + res.status);
-        }
+        if (!res.ok) throw new Error('API error: ' + res.status);
 
         let orders = await res.json();
+        if (!Array.isArray(orders)) orders = [];
 
-        if (!Array.isArray(orders)) {
-          orders = [];
-        }
-
-        orders.sort((a, b) => {
-          const dateA = new Date(a.created_at || 0).getTime();
-          const dateB = new Date(b.created_at || 0).getTime();
-          return dateB - dateA;
-        });
+        orders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
         if (orders.length === 0) {
           list.className = 'empty-state';
@@ -1426,42 +1335,14 @@
               <div class="message-name">${escapeHtml(order.customer_name || 'Unknown')}</div>
               <div class="message-time">${formatDate(order.created_at)}</div>
             </div>
-
             <div class="message-grid">
-              <div class="message-field">
-                <div class="label">Email</div>
-                <div class="value">${escapeHtml(order.email || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Phone</div>
-                <div class="value">${escapeHtml(order.phone || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Address</div>
-                <div class="value">${escapeHtml(order.shipping_address || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Product</div>
-                <div class="value">${escapeHtml(order.product_name || '—')}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Quantity</div>
-                <div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Price</div>
-                <div class="value">${escapeHtml(String(order.price ?? '—'))}</div>
-              </div>
-
-              <div class="message-field">
-                <div class="label">Order ID</div>
-                <div class="value">${escapeHtml(String(order.id ?? '—'))}</div>
-              </div>
+              <div class="message-field"><div class="label">Email</div><div class="value">${escapeHtml(order.email || '—')}</div></div>
+              <div class="message-field"><div class="label">Phone</div><div class="value">${escapeHtml(order.phone || '—')}</div></div>
+              <div class="message-field"><div class="label">Address</div><div class="value">${escapeHtml(order.shipping_address || '—')}</div></div>
+              <div class="message-field"><div class="label">Product</div><div class="value">${escapeHtml(order.product_name || '—')}</div></div>
+              <div class="message-field"><div class="label">Quantity</div><div class="value">${escapeHtml(String(order.quantity ?? '—'))}</div></div>
+              <div class="message-field"><div class="label">Price</div><div class="value">${escapeHtml(String(order.price ?? '—'))}</div></div>
+              <div class="message-field"><div class="label">Order ID</div><div class="value">${escapeHtml(String(order.id ?? '—'))}</div></div>
             </div>
           </div>
         `).join('');
@@ -1524,9 +1405,7 @@
         const res = await fetch(CUSTOMERS_API);
         const data = await res.json();
 
-        if (!res.ok || !Array.isArray(data)) {
-          throw new Error('Failed to load customers');
-        }
+        if (!res.ok || !Array.isArray(data)) throw new Error('Failed to load customers');
 
         const normalized = data.map(customer => ({
           ...customer,
@@ -1553,82 +1432,48 @@
     async function createCustomer(customer) {
       const res = await fetch(CUSTOMERS_API, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(customer)
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to create customer');
-      }
-
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to create customer');
       return data.customer;
     }
 
     async function updateCustomer(customer) {
-      const payload = {
-        ...customer
-      };
-
-      if (payload.reviewedBy !== undefined) {
-        payload.reviewed_by = payload.reviewedBy;
-        delete payload.reviewedBy;
-      }
-
-      if (payload.reviewedAt !== undefined) {
-        payload.reviewed_at = payload.reviewedAt;
-        delete payload.reviewedAt;
-      }
+      const payload = { ...customer };
+      if (payload.reviewedBy !== undefined) { payload.reviewed_by = payload.reviewedBy; delete payload.reviewedBy; }
+      if (payload.reviewedAt !== undefined) { payload.reviewed_at = payload.reviewedAt; delete payload.reviewedAt; }
 
       const res = await fetch(CUSTOMERS_API, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to update customer');
-      }
-
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to update customer');
       return data.customer;
     }
 
     async function deleteCustomer(id) {
       const res = await fetch(CUSTOMERS_API, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to delete customer');
-      }
-
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete customer');
       return true;
     }
 
     async function copyCustomer(customer, button) {
       const text = getCustomerCopyText(customer);
-
       try {
         await navigator.clipboard.writeText(text);
         if (button) {
           const original = button.textContent;
           button.textContent = 'Copied';
-          setTimeout(() => {
-            button.textContent = original;
-          }, 1200);
+          setTimeout(() => { button.textContent = original; }, 1200);
         }
       } catch (err) {
         console.error('COPY ERROR:', err);
@@ -1640,105 +1485,39 @@
       card.className = 'customer-card' + (customer.reviewed ? ' reviewed' : '');
 
       const reviewedInfo = customer.reviewed
-        ? `
-          <div class="customer-status show">
-            Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}
-            ${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}
-          </div>
-        `
+        ? `<div class="customer-status show">Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}</div>`
         : '';
 
       if (customer.saved) {
         card.innerHTML = `
           <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
-
-          <div class="customer-display-field">
-            <div class="customer-display-label">Address</div>
-            <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
-          </div>
-
-          <div class="customer-display-field">
-            <div class="customer-display-label">Email</div>
-            <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
-          </div>
-
-          <div class="customer-display-field">
-            <div class="customer-display-label">Phone</div>
-            <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
-          </div>
-
-          <div class="customer-display-field">
-            <div class="customer-display-label">Note</div>
-            <div class="customer-display-value">${escapeHtml(customer.note || '—')}</div>
-          </div>
-
-          <div class="customer-display-field">
-            <div class="customer-display-label">Status</div>
-            <div class="customer-display-value">${escapeHtml(customer.status || '—')}</div>
-          </div>
-
-          <div class="customer-display-field">
-            <div class="customer-display-label">Priority</div>
-            <div class="customer-display-value">${escapeHtml(customer.priority || '—')}</div>
-          </div>
-
+          <div class="customer-display-field"><div class="customer-display-label">Address</div><div class="customer-display-value">${escapeHtml(customer.address || '—')}</div></div>
+          <div class="customer-display-field"><div class="customer-display-label">Email</div><div class="customer-display-value">${escapeHtml(customer.email || '—')}</div></div>
+          <div class="customer-display-field"><div class="customer-display-label">Phone</div><div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div></div>
+          <div class="customer-display-field"><div class="customer-display-label">Note</div><div class="customer-display-value">${escapeHtml(customer.note || '—')}</div></div>
+          <div class="customer-display-field"><div class="customer-display-label">Status</div><div class="customer-display-value">${escapeHtml(customer.status || '—')}</div></div>
+          <div class="customer-display-field"><div class="customer-display-label">Priority</div><div class="customer-display-value">${escapeHtml(customer.priority || '—')}</div></div>
           ${reviewedInfo}
-
           <div class="customer-card-actions">
             <button class="customer-delete-btn" type="button">Delete</button>
             <button class="customer-copy-btn" type="button">Copy</button>
           </div>
         `;
-
         card.querySelector('.customer-delete-btn').addEventListener('click', async () => {
-          try {
-            await deleteCustomer(customer.id);
-            await loadCustomers(true);
-          } catch (err) {
-            console.error(err);
-          }
+          try { await deleteCustomer(customer.id); await loadCustomers(true); } catch (err) { console.error(err); }
         });
-
-        card.querySelector('.customer-copy-btn').addEventListener('click', (e) => {
-          copyCustomer(customer, e.currentTarget);
-        });
-
+        card.querySelector('.customer-copy-btn').addEventListener('click', (e) => { copyCustomer(customer, e.currentTarget); });
         return card;
       }
 
       card.innerHTML = `
         <input class="customer-name-input" type="text" placeholder="Customer name" value="${escapeAttribute(customer.name || '')}" />
-
-        <div class="customer-field">
-          <div class="customer-label">Address</div>
-          <input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Email</div>
-          <input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Phone</div>
-          <input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Note</div>
-          <input class="customer-input customer-note" type="text" placeholder="Enter note" value="${escapeAttribute(customer.note || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Status</div>
-          <input class="customer-input customer-status-field" type="text" placeholder="Enter status" value="${escapeAttribute(customer.status || '')}" />
-        </div>
-
-        <div class="customer-field">
-          <div class="customer-label">Priority</div>
-          <input class="customer-input customer-priority" type="text" placeholder="Enter priority" value="${escapeAttribute(customer.priority || '')}" />
-        </div>
-
+        <div class="customer-field"><div class="customer-label">Address</div><input class="customer-input customer-address" type="text" placeholder="Enter address" value="${escapeAttribute(customer.address || '')}" /></div>
+        <div class="customer-field"><div class="customer-label">Email</div><input class="customer-input customer-email" type="email" placeholder="Enter email" value="${escapeAttribute(customer.email || '')}" /></div>
+        <div class="customer-field"><div class="customer-label">Phone</div><input class="customer-input customer-phone" type="text" placeholder="Enter phone number" value="${escapeAttribute(customer.phone || '')}" /></div>
+        <div class="customer-field"><div class="customer-label">Note</div><input class="customer-input customer-note" type="text" placeholder="Enter note" value="${escapeAttribute(customer.note || '')}" /></div>
+        <div class="customer-field"><div class="customer-label">Status</div><input class="customer-input customer-status-field" type="text" placeholder="Enter status" value="${escapeAttribute(customer.status || '')}" /></div>
+        <div class="customer-field"><div class="customer-label">Priority</div><input class="customer-input customer-priority" type="text" placeholder="Enter priority" value="${escapeAttribute(customer.priority || '')}" /></div>
         <div class="customer-card-actions">
           <button class="customer-save-btn" type="button">Save</button>
           <button class="customer-delete-btn" type="button">Delete</button>
@@ -1752,36 +1531,16 @@
       const noteInput = card.querySelector('.customer-note');
       const statusInput = card.querySelector('.customer-status-field');
       const priorityInput = card.querySelector('.customer-priority');
-      const saveBtn = card.querySelector('.customer-save-btn');
-      const deleteBtn = card.querySelector('.customer-delete-btn');
 
-      saveBtn.addEventListener('click', async () => {
+      card.querySelector('.customer-save-btn').addEventListener('click', async () => {
         try {
-          await updateCustomer({
-            id: customer.id,
-            name: nameInput.value.trim(),
-            address: addressInput.value.trim(),
-            email: emailInput.value.trim(),
-            phone: phoneInput.value.trim(),
-            note: noteInput.value.trim(),
-            status: statusInput.value.trim(),
-            priority: priorityInput.value.trim(),
-            saved: true
-          });
-
+          await updateCustomer({ id: customer.id, name: nameInput.value.trim(), address: addressInput.value.trim(), email: emailInput.value.trim(), phone: phoneInput.value.trim(), note: noteInput.value.trim(), status: statusInput.value.trim(), priority: priorityInput.value.trim(), saved: true });
           await loadCustomers(true);
-        } catch (err) {
-          console.error(err);
-        }
+        } catch (err) { console.error(err); }
       });
 
-      deleteBtn.addEventListener('click', async () => {
-        try {
-          await deleteCustomer(customer.id);
-          await loadCustomers(true);
-        } catch (err) {
-          console.error(err);
-        }
+      card.querySelector('.customer-delete-btn').addEventListener('click', async () => {
+        try { await deleteCustomer(customer.id); await loadCustomers(true); } catch (err) { console.error(err); }
       });
 
       return card;
@@ -1793,85 +1552,34 @@
 
       card.innerHTML = `
         <div class="customer-display-name">${escapeHtml(customer.name || 'Unnamed customer')}</div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Address</div>
-          <div class="customer-display-value">${escapeHtml(customer.address || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Email</div>
-          <div class="customer-display-value">${escapeHtml(customer.email || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Phone</div>
-          <div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Note</div>
-          <div class="customer-display-value">${escapeHtml(customer.note || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Status</div>
-          <div class="customer-display-value">${escapeHtml(customer.status || '—')}</div>
-        </div>
-
-        <div class="customer-display-field">
-          <div class="customer-display-label">Priority</div>
-          <div class="customer-display-value">${escapeHtml(customer.priority || '—')}</div>
-        </div>
-
+        <div class="customer-display-field"><div class="customer-display-label">Address</div><div class="customer-display-value">${escapeHtml(customer.address || '—')}</div></div>
+        <div class="customer-display-field"><div class="customer-display-label">Email</div><div class="customer-display-value">${escapeHtml(customer.email || '—')}</div></div>
+        <div class="customer-display-field"><div class="customer-display-label">Phone</div><div class="customer-display-value">${escapeHtml(customer.phone || '—')}</div></div>
+        <div class="customer-display-field"><div class="customer-display-label">Note</div><div class="customer-display-value">${escapeHtml(customer.note || '—')}</div></div>
+        <div class="customer-display-field"><div class="customer-display-label">Status</div><div class="customer-display-value">${escapeHtml(customer.status || '—')}</div></div>
+        <div class="customer-display-field"><div class="customer-display-label">Priority</div><div class="customer-display-value">${escapeHtml(customer.priority || '—')}</div></div>
         <div class="customer-card-actions">
-          <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>
-            ${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}
-          </button>
+          <button class="customer-review-btn" type="button" ${customer.reviewed ? 'disabled' : ''}>${customer.reviewed ? 'Bearbeitet' : 'Als bearbeitet markieren'}</button>
           <button class="customer-copy-btn" type="button">Copy</button>
         </div>
-
         <div class="customer-status ${customer.reviewed ? 'show' : ''}">
-          ${customer.reviewed
-            ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}`
-            : 'Bearbeitet'}
+          ${customer.reviewed ? `Bearbeitet${customer.reviewedBy ? ' von ' + escapeHtml(customer.reviewedBy) : ''}${customer.reviewedAt ? '<br>' + escapeHtml(formatDate(customer.reviewedAt)) : ''}` : 'Bearbeitet'}
         </div>
       `;
 
-      const reviewBtn = card.querySelector('.customer-review-btn');
-      const copyBtn = card.querySelector('.customer-copy-btn');
-
-      reviewBtn.addEventListener('click', async () => {
-        try {
-          await updateCustomer({
-            id: customer.id,
-            reviewed: true,
-            reviewedBy: currentUser?.username || 'staff'
-          });
-
-          await loadCustomers(true);
-        } catch (err) {
-          console.error(err);
-        }
+      card.querySelector('.customer-review-btn').addEventListener('click', async () => {
+        try { await updateCustomer({ id: customer.id, reviewed: true, reviewedBy: currentUser?.username || 'staff' }); await loadCustomers(true); } catch (err) { console.error(err); }
       });
-
-      copyBtn.addEventListener('click', (e) => {
-        copyCustomer(customer, e.currentTarget);
-      });
+      card.querySelector('.customer-copy-btn').addEventListener('click', (e) => { copyCustomer(customer, e.currentTarget); });
 
       return card;
     }
 
     function rerenderCustomers() {
       if (!customersList) return;
-
       customersList.innerHTML = '';
-
       customersCache.forEach((customer) => {
-        const card = currentUser?.role === 'admin'
-          ? renderAdminCustomerCard(customer)
-          : renderStaffCustomerCard(customer);
-
+        const card = currentUser?.role === 'admin' ? renderAdminCustomerCard(customer) : renderStaffCustomerCard(customer);
         customersList.appendChild(card);
       });
     }
@@ -1882,51 +1590,22 @@
       try {
         usersList.innerHTML = '<div class="loading">Loading users...</div>';
 
-        const res = await fetch(USERS_API, {
-          headers: getAuthHeaders()
-        });
-
+        const res = await fetch(USERS_API, { headers: getAuthHeaders() });
         const data = await res.json();
 
-        if (!res.ok || !Array.isArray(data)) {
-          throw new Error(data?.error || 'Failed to load users');
-        }
-
-        if (data.length === 0) {
-          usersList.innerHTML = '<div class="empty-state">No users found.</div>';
-          return;
-        }
+        if (!res.ok || !Array.isArray(data)) throw new Error(data?.error || 'Failed to load users');
+        if (data.length === 0) { usersList.innerHTML = '<div class="empty-state">No users found.</div>'; return; }
 
         usersList.innerHTML = '';
 
         data.forEach((user) => {
           const card = document.createElement('div');
           card.className = 'user-card';
-
           card.innerHTML = `
-            <div class="customer-field">
-              <div class="customer-label">Username</div>
-              <input class="customer-input user-username" type="text" value="${escapeAttribute(user.username || '')}" />
-            </div>
-
-            <div class="customer-field">
-              <div class="customer-label">New Password</div>
-              <input class="customer-input user-password" type="text" placeholder="Leave empty to keep current password" value="" />
-            </div>
-
-            <div class="customer-field">
-              <div class="customer-label">Role</div>
-              <select class="user-select user-role">
-                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
-                <option value="staff" ${user.role === 'staff' ? 'selected' : ''}>staff</option>
-              </select>
-            </div>
-
-            <div class="customer-display-field">
-              <div class="customer-display-label">Created</div>
-              <div class="customer-display-value">${escapeHtml(formatDate(user.created_at))}</div>
-            </div>
-
+            <div class="customer-field"><div class="customer-label">Username</div><input class="customer-input user-username" type="text" value="${escapeAttribute(user.username || '')}" /></div>
+            <div class="customer-field"><div class="customer-label">New Password</div><input class="customer-input user-password" type="text" placeholder="Leave empty to keep current password" value="" /></div>
+            <div class="customer-field"><div class="customer-label">Role</div><select class="user-select user-role"><option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option><option value="staff" ${user.role === 'staff' ? 'selected' : ''}>staff</option></select></div>
+            <div class="customer-display-field"><div class="customer-display-label">Created</div><div class="customer-display-value">${escapeHtml(formatDate(user.created_at))}</div></div>
             <div class="user-card-actions">
               <button class="user-save-btn" type="button">Save</button>
               <button class="user-delete-btn" type="button">Delete</button>
@@ -1936,56 +1615,23 @@
           const usernameInput = card.querySelector('.user-username');
           const passwordInput = card.querySelector('.user-password');
           const roleSelect = card.querySelector('.user-role');
-          const saveBtn = card.querySelector('.user-save-btn');
-          const deleteBtn = card.querySelector('.user-delete-btn');
 
-          saveBtn.addEventListener('click', async () => {
+          card.querySelector('.user-save-btn').addEventListener('click', async () => {
             try {
-              const res = await fetch(USERS_API, {
-                method: 'PUT',
-                headers: getAuthHeaders(),
-                body: JSON.stringify({
-                  id: user.id,
-                  username: usernameInput.value.trim(),
-                  password: passwordInput.value.trim(),
-                  role: roleSelect.value
-                })
-              });
-
+              const res = await fetch(USERS_API, { method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify({ id: user.id, username: usernameInput.value.trim(), password: passwordInput.value.trim(), role: roleSelect.value }) });
               const result = await res.json();
-
-              if (!res.ok || !result.success) {
-                throw new Error(result?.error || 'Failed to update user');
-              }
-
+              if (!res.ok || !result.success) throw new Error(result?.error || 'Failed to update user');
               await loadUsers();
-            } catch (err) {
-              console.error('UPDATE USER ERROR:', err);
-              alert('Update User Fehler: ' + (err?.message || err));
-            }
+            } catch (err) { console.error('UPDATE USER ERROR:', err); alert('Update User Fehler: ' + (err?.message || err)); }
           });
 
-          deleteBtn.addEventListener('click', async () => {
+          card.querySelector('.user-delete-btn').addEventListener('click', async () => {
             try {
-              const res = await fetch(USERS_API, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-                body: JSON.stringify({
-                  id: user.id
-                })
-              });
-
+              const res = await fetch(USERS_API, { method: 'DELETE', headers: getAuthHeaders(), body: JSON.stringify({ id: user.id }) });
               const result = await res.json();
-
-              if (!res.ok || !result.success) {
-                throw new Error(result?.error || 'Failed to delete user');
-              }
-
+              if (!res.ok || !result.success) throw new Error(result?.error || 'Failed to delete user');
               await loadUsers();
-            } catch (err) {
-              console.error('DELETE USER ERROR:', err);
-              alert('Delete User Fehler: ' + (err?.message || err));
-            }
+            } catch (err) { console.error('DELETE USER ERROR:', err); alert('Delete User Fehler: ' + (err?.message || err)); }
           });
 
           usersList.appendChild(card);
@@ -1998,39 +1644,17 @@
 
     async function createUser() {
       if (currentUser?.role !== 'admin') return;
-
       const username = prompt('Enter username:');
       if (!username) return;
-
       const password = prompt('Enter password:');
       if (!password) return;
-
       const role = prompt('Enter role: admin or staff', 'staff');
       if (!role) return;
-
       const cleanRole = role.trim().toLowerCase();
-
-      if (!['admin', 'staff'].includes(cleanRole)) {
-        alert('Role must be admin or staff');
-        return;
-      }
-
-      const res = await fetch(USERS_API, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          username: username.trim(),
-          password,
-          role: cleanRole
-        })
-      });
-
+      if (!['admin', 'staff'].includes(cleanRole)) { alert('Role must be admin or staff'); return; }
+      const res = await fetch(USERS_API, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ username: username.trim(), password, role: cleanRole }) });
       const result = await res.json();
-
-      if (!res.ok || !result.success) {
-        throw new Error(result?.error || 'Failed to create user');
-      }
-
+      if (!res.ok || !result.success) throw new Error(result?.error || 'Failed to create user');
       return result.user;
     }
 
@@ -2042,82 +1666,41 @@
         activeSessionsList.innerHTML = '<div class="loading">Loading active sessions...</div>';
         sessionsHistoryList.innerHTML = '<div class="loading">Loading session history...</div>';
 
-        const res = await fetch(SESSIONS_API, {
-          headers: getAuthHeaders()
-        });
-
+        const res = await fetch(SESSIONS_API, { headers: getAuthHeaders() });
         const data = await res.json();
 
-        if (!res.ok || !data.success) {
-          throw new Error(data?.error || 'Failed to load sessions');
-        }
+        if (!res.ok || !data.success) throw new Error(data?.error || 'Failed to load sessions');
 
         const active = Array.isArray(data.active) ? data.active : [];
         const history = Array.isArray(data.history) ? data.history : [];
 
-        if (active.length === 0) {
-          activeSessionsList.innerHTML = '<div class="empty-state">No active users right now.</div>';
-        } else {
-          activeSessionsList.innerHTML = active.map(session => `
+        activeSessionsList.innerHTML = active.length === 0
+          ? '<div class="empty-state">No active users right now.</div>'
+          : active.map(session => `
             <div class="message-item">
-              <div class="message-top">
-                <div class="message-name">${escapeHtml(session.username)}</div>
-                <div class="message-time">${formatDate(session.login_at)}</div>
-              </div>
-
+              <div class="message-top"><div class="message-name">${escapeHtml(session.username)}</div><div class="message-time">${formatDate(session.login_at)}</div></div>
               <div class="message-grid">
-                <div class="message-field">
-                  <div class="label">Role</div>
-                  <div class="value">${escapeHtml(session.role || '—')}</div>
-                </div>
-                <div class="message-field">
-                  <div class="label">Login At</div>
-                  <div class="value">${escapeHtml(formatDate(session.login_at))}</div>
-                </div>
-                <div class="message-field">
-                  <div class="label">Status</div>
-                  <div class="value">Online</div>
-                </div>
+                <div class="message-field"><div class="label">Role</div><div class="value">${escapeHtml(session.role || '—')}</div></div>
+                <div class="message-field"><div class="label">Login At</div><div class="value">${escapeHtml(formatDate(session.login_at))}</div></div>
+                <div class="message-field"><div class="label">Status</div><div class="value">Online</div></div>
               </div>
             </div>
           `).join('');
-        }
 
-        if (history.length === 0) {
-          sessionsHistoryList.innerHTML = '<div class="empty-state">No session history found.</div>';
-        } else {
-          sessionsHistoryList.innerHTML = history.map(session => `
+        sessionsHistoryList.innerHTML = history.length === 0
+          ? '<div class="empty-state">No session history found.</div>'
+          : history.map(session => `
             <div class="message-item">
-              <div class="message-top">
-                <div class="message-name">${escapeHtml(session.username)}</div>
-                <div class="message-time">${formatDate(session.login_at)}</div>
-              </div>
-
+              <div class="message-top"><div class="message-name">${escapeHtml(session.username)}</div><div class="message-time">${formatDate(session.login_at)}</div></div>
               <div class="message-grid">
-                <div class="message-field">
-                  <div class="label">Role</div>
-                  <div class="value">${escapeHtml(session.role || '—')}</div>
-                </div>
-                <div class="message-field">
-                  <div class="label">Login At</div>
-                  <div class="value">${escapeHtml(formatDate(session.login_at))}</div>
-                </div>
-                <div class="message-field">
-                  <div class="label">Logout At</div>
-                  <div class="value">${escapeHtml(session.logout_at ? formatDate(session.logout_at) : 'Still online')}</div>
-                </div>
-                <div class="message-field">
-                  <div class="label">Duration</div>
-                  <div class="value">${escapeHtml(formatDuration(session.duration_seconds))}</div>
-                </div>
-                <div class="message-field">
-                  <div class="label">Status</div>
-                  <div class="value">${escapeHtml(session.session_status || '—')}</div>
-                </div>
+                <div class="message-field"><div class="label">Role</div><div class="value">${escapeHtml(session.role || '—')}</div></div>
+                <div class="message-field"><div class="label">Login At</div><div class="value">${escapeHtml(formatDate(session.login_at))}</div></div>
+                <div class="message-field"><div class="label">Logout At</div><div class="value">${escapeHtml(session.logout_at ? formatDate(session.logout_at) : 'Still online')}</div></div>
+                <div class="message-field"><div class="label">Duration</div><div class="value">${escapeHtml(formatDuration(session.duration_seconds))}</div></div>
+                <div class="message-field"><div class="label">Status</div><div class="value">${escapeHtml(session.session_status || '—')}</div></div>
               </div>
             </div>
           `).join('');
-        }
       } catch (err) {
         console.error('LOAD SESSIONS ERROR:', err);
         activeSessionsList.innerHTML = `<div class="error-state">${escapeHtml(err?.message || 'Error loading active sessions.')}</div>`;
@@ -2127,33 +1710,15 @@
 
     addCustomerBtn.addEventListener('click', async () => {
       try {
-        await createCustomer({
-          name: '',
-          address: '',
-          email: '',
-          phone: '',
-          note: '',
-          status: '',
-          priority: '',
-          saved: false
-        });
-
+        await createCustomer({ name: '', address: '', email: '', phone: '', note: '', status: '', priority: '', saved: false });
         await loadCustomers(true);
-      } catch (err) {
-        console.error('ADD CUSTOMER ERROR:', err);
-        alert('Add Customer Fehler: ' + (err?.message || err));
-      }
+      } catch (err) { console.error('ADD CUSTOMER ERROR:', err); alert('Add Customer Fehler: ' + (err?.message || err)); }
     });
 
     if (addUserBtn) {
       addUserBtn.addEventListener('click', async () => {
-        try {
-          await createUser();
-          await loadUsers();
-        } catch (err) {
-          console.error('ADD USER ERROR:', err);
-          alert('Add User Fehler: ' + (err?.message || err));
-        }
+        try { await createUser(); await loadUsers(); }
+        catch (err) { console.error('ADD USER ERROR:', err); alert('Add User Fehler: ' + (err?.message || err)); }
       });
     }
 
@@ -2165,7 +1730,7 @@
       showLogin();
     }
 
-    // ── Copied from doc 3: approve/deny logic ──
+    // Approve / Deny logic
     let pending = 2;
     const decided = new Set();
 
@@ -2209,7 +1774,6 @@
         document.getElementById('pending-count').textContent = pending;
       }
     }
-    // ── End approve/deny logic ──
   </script>
 </body>
 </html>
