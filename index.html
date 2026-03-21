@@ -1372,7 +1372,7 @@
       return data.customer;
     }
 
-   async function updateCustomer(customer) {
+      async function updateCustomer(customer) {
   const payload = {
     ...customer
   };
@@ -1403,16 +1403,7 @@
 
   return data.customer;
 }
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to update customer');
-      }
-
-      return data.customer;
-    }
-
+    
     async function deleteCustomer(id) {
       const res = await fetch(CUSTOMERS_API, {
         method: 'DELETE',
